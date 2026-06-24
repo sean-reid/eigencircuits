@@ -1,0 +1,36 @@
+# Internal research material (kept locally, used to build lexicons; not part of the published repo)
+research/
+
+# Tooling / assistant config
+.claude/
+CLAUDE.md
+
+# Node
+node_modules/
+dist/
+build/
+.vite/
+*.tsbuildinfo
+coverage/
+playwright-report/
+test-results/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+
+# Cloudflare / Wrangler
+.wrangler/
+.dev.vars
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.local

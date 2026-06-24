@@ -1,0 +1,29 @@
+{
+  "name": "eigencircuits",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Procedurally generated arXiv-style mathematics papers.",
+  "type": "module",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @eigencircuits/web dev",
+    "build": "pnpm -r build",
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write .",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "engine:test": "uv --project packages/engine run pytest",
+    "engine:lint": "uv --project packages/engine run ruff check . && uv --project packages/engine run ruff format --check .",
+    "engine:typecheck": "uv --project packages/engine run mypy ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "eslint": "^9.18.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.21.0"
+  }
+}
