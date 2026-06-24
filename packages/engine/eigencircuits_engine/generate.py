@@ -78,14 +78,26 @@ def generate(seed: str | int | None = None) -> PaperModel:
         "long": rng.int_in_range(5, 7),
     }[style.length_class]
     has_prelim = style.length_class != "note" and rng.chance(0.85)
+    has_final = rng.chance(0.6)
 
-    sections: list[SectionModel] = [_intro_section(ctx, core_count, has_prelim)]
+    # Plan the section headings up front so the introduction's outline is
+    # accurate and no two headings collide.
+    headings = _plan_headings(ctx, core_count, has_prelim, has_final)
+    outline = _outline(headings)
+
+    sections: list[SectionModel] = []
+    cursor = 0
+    sections.append(_intro_section(ctx, headings[cursor], outline))
+    cursor += 1
     if has_prelim:
-        sections.append(_prelim_section(ctx))
+        sections.append(_prelim_section(ctx, headings[cursor]))
+        cursor += 1
     for _ in range(core_count):
-        sections.append(_core_section(ctx))
-    if rng.chance(0.6):
-        sections.append(_final_section(ctx))
+        sections.append(_core_section(ctx, headings[cursor]))
+        cursor += 1
+    if has_final:
+        sections.append(_final_section(ctx, headings[cursor]))
+        cursor += 1
 
     acknowledgments = _acknowledgments(ctx)
     funding = make_funding(rng)
@@ -166,8 +178,8 @@ def _start_section(ctx: GenContext, heading: str) -> str:
     return str(ctx.counters["sec"])
 
 
-def _intro_section(ctx: GenContext, core_count: int, has_prelim: bool) -> SectionModel:
-    number = _start_section(ctx, "Introduction")
+def _intro_section(ctx: GenContext, heading: str, outline: str) -> SectionModel:
+    number = _start_section(ctx, heading)
     blocks: list[Block] = []
 
     opener = expand(NT("IntroContext"), ctx)
@@ -187,14 +199,13 @@ def _intro_section(ctx: GenContext, core_count: int, has_prelim: bool) -> Sectio
         )
     )
     blocks.append(Para(finalize(expand(NT("IntroStrategy"), ctx))))
-    blocks.append(Para(_outline(ctx, core_count, has_prelim)))
+    blocks.append(Para(outline))
 
     ctx.pop_scope()
-    return SectionModel(number=number, heading="Introduction", blocks=blocks)
+    return SectionModel(number=number, heading=heading, blocks=blocks)
 
 
-def _prelim_section(ctx: GenContext) -> SectionModel:
-    heading = cap_first(f"Preliminaries on {pluralize(ctx.rng.choice(ctx.field.bank('objects')))}")
+def _prelim_section(ctx: GenContext, heading: str) -> SectionModel:
     number = _start_section(ctx, heading)
     blocks: list[Block] = [_env(ctx, "Definition", "DefinitionStmt")]
     if ctx.rng.chance(0.7):
@@ -203,8 +214,7 @@ def _prelim_section(ctx: GenContext) -> SectionModel:
     return SectionModel(number=number, heading=heading, blocks=blocks)
 
 
-def _core_section(ctx: GenContext) -> SectionModel:
-    heading = _core_heading(ctx)
+def _core_section(ctx: GenContext, heading: str) -> SectionModel:
     number = _start_section(ctx, heading)
     blocks: list[Block] = []
     if ctx.rng.chance(0.45):
@@ -227,14 +237,27 @@ def _core_section(ctx: GenContext) -> SectionModel:
     return SectionModel(number=number, heading=heading, blocks=blocks)
 
 
-def _final_section(ctx: GenContext) -> SectionModel:
-    heading = ctx.rng.choice(
-        ("Concluding remarks", "Final remarks", "Applications", "Further questions")
-    )
+_FINAL_HEADINGS = ("Concluding remarks", "Final remarks", "Applications", "Further questions")
+
+
+def _final_section(ctx: GenContext, heading: str) -> SectionModel:
     number = _start_section(ctx, heading)
-    blocks: list[Block] = [Para(finalize(expand(NT("RemarkStmt"), ctx)))]
-    if ctx.rng.chance(0.6):
-        blocks.append(Para(finalize(expand(NT("AbstractApplication"), ctx))))
+    # Distinct closing sentences (not just non-adjacent): match on the opening
+    # words so "It remains open..." cannot appear twice in the same paragraph.
+    sentences: list[str] = []
+    seen: set[str] = set()
+    target = ctx.rng.int_in_range(2, 4)
+    tries = 0
+    while len(sentences) < target and tries < 24:
+        sentence = expand(NT("ClosingRemark"), ctx)
+        key = " ".join(sentence.split()[:3]).lower()
+        if key not in seen:
+            seen.add(key)
+            sentences.append(sentence)
+        tries += 1
+    blocks: list[Block] = [Para(finalize(" ".join(sentences)))]
+    if ctx.rng.chance(0.4):
+        blocks.append(_env(ctx, "Conjecture", "ConjectureStmt"))
     ctx.pop_scope()
     return SectionModel(number=number, heading=heading, blocks=blocks)
 
@@ -388,18 +411,56 @@ def _core_heading(ctx: GenContext) -> str:
             (2.0, f"Construction of the {obj}"),
             (2.0, "Proof of the main theorem"),
             (1.0, f"{cap_first(inv)} estimates"),
+            (1.0, f"Applications to {pluralize(obj)}"),
         ]
     )
     return cap_first(template)
 
 
-def _outline(ctx: GenContext, core_count: int, has_prelim: bool) -> str:
-    parts = ["The paper is organized as follows."]
-    sec = 2
+def _plan_headings(
+    ctx: GenContext, core_count: int, has_prelim: bool, has_final: bool
+) -> list[str]:
+    headings = ["Introduction"]
     if has_prelim:
-        parts.append(f"Section {sec} fixes notation and recalls the necessary background.")
-        sec += 1
-    parts.append(f"In Section {sec} we prove our main results.")
-    if core_count > 1:
-        parts.append("The remaining sections develop consequences and worked examples.")
+        prelim = cap_first(
+            f"Preliminaries on {pluralize(ctx.rng.choice(ctx.field.bank('objects')))}"
+        )
+        headings.append(prelim)
+    used = {h.lower() for h in headings}
+    proof_used = False
+    for _ in range(core_count):
+        heading = _core_heading(ctx)
+        for _retry in range(8):
+            clash = heading.lower() in used or (
+                heading == "Proof of the main theorem" and proof_used
+            )
+            if not clash:
+                break
+            heading = _core_heading(ctx)
+        used.add(heading.lower())
+        proof_used = proof_used or heading == "Proof of the main theorem"
+        headings.append(heading)
+    if has_final:
+        headings.append(ctx.rng.choice(_FINAL_HEADINGS))
+    return headings
+
+
+def _outline(headings: list[str]) -> str:
+    n = len(headings)
+    parts = ["The paper is organized as follows."]
+    pos = 1
+    if n > 1 and headings[1].startswith("Preliminaries"):
+        parts.append("Section 2 fixes notation and recalls the necessary background.")
+        pos = 2
+    has_final = headings[-1] in _FINAL_HEADINGS
+    last_core = (n - 1) if has_final else n
+    first_core = pos + 1
+    if first_core == last_core:
+        parts.append(f"In Section {first_core} we prove our main results.")
+    elif first_core < last_core:
+        parts.append(
+            f"Sections {first_core}--{last_core} are devoted to the proofs of our main results."
+        )
+    if has_final:
+        parts.append(f"In Section {n} we discuss applications and open questions.")
     return finalize(" ".join(parts))

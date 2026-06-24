@@ -26,6 +26,8 @@ def _preamble(section_numbered: bool) -> str:
         r"\newtheorem{lemma}[theorem]{Lemma}"
         "\n"
         r"\newtheorem{corollary}[theorem]{Corollary}"
+        "\n"
+        r"\newtheorem{conjecture}[theorem]{Conjecture}"
         "\n\\theoremstyle{definition}\n"
         r"\newtheorem{definition}[theorem]{Definition}"
         "\n"
@@ -41,6 +43,7 @@ _ENV_NAMES = {
     "Proposition": "proposition",
     "Lemma": "lemma",
     "Corollary": "corollary",
+    "Conjecture": "conjecture",
     "Definition": "definition",
     "Example": "example",
     "Remark": "remark",

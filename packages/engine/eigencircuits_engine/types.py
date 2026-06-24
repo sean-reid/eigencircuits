@@ -181,6 +181,7 @@ class GenContext:
     recent: dict[str, list[str]] = dfield(default_factory=dict)
     extra: dict[str, Sequence[str]] = dfield(default_factory=dict)  # global banks (names, ...)
     cite_labels: list[str] = dfield(default_factory=list)  # bibliography labels for citations
+    choice_last: dict[int, int] = dfield(default_factory=dict)  # last option per choice node
 
     def push_scope(self, kind: str) -> None:
         self.scopes.append(Scope(kind))

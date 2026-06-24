@@ -44,6 +44,7 @@ _inline_eqn = choice(
     ]
 )
 _iso_eqn = eqn("iso")
+_map_eqn = eqn("map")
 _display_eqn = choice(
     [
         (1, eqn("field", True)),
@@ -405,7 +406,7 @@ GRAMMAR: Grammar = {
                 1,
                 seq(
                     lit("the natural map "),
-                    _iso_eqn,
+                    _map_eqn,
                     lit(" is "),
                     choice(
                         [(1, lit("surjective")), (1, lit("injective")), (1, lit("an isomorphism"))]
@@ -577,6 +578,69 @@ GRAMMAR: Grammar = {
                 1,
                 seq(
                     lit("Consider "), _a_central, lit(". In this case "), nt("Conclusion"), lit(".")
+                ),
+            ),
+        ]
+    ),
+    "ConjectureStmt": choice(
+        [
+            (2, seq(lit("We conjecture that "), nt("Conclusion"), lit("."))),
+            (
+                2,
+                seq(
+                    lit("We expect that, if "),
+                    nt("Hypothesis"),
+                    lit(", then "),
+                    nt("Conclusion"),
+                    lit("."),
+                ),
+            ),
+            (1, seq(lit("It is natural to conjecture that "), nt("Conclusion"), lit("."))),
+        ]
+    ),
+    "ClosingRemark": choice(
+        [
+            (
+                2,
+                seq(
+                    lit("It would be interesting to "),
+                    choice([(1, lit("determine")), (1, lit("decide")), (1, lit("know"))]),
+                    lit(" whether "),
+                    nt("Conclusion"),
+                    lit("."),
+                ),
+            ),
+            (
+                2,
+                seq(
+                    lit("We expect that "),
+                    nt("Conclusion"),
+                    lit(", though we have not been able to prove this."),
+                ),
+            ),
+            (2, seq(lit("A natural question is whether "), nt("Conclusion"), lit("."))),
+            (2, seq(lit("It remains open whether "), nt("Conclusion"), lit("."))),
+            (1, seq(lit("We conjecture that "), nt("Conclusion"), lit("."))),
+            (1, seq(lit("Our methods should extend to "), plural(pick("objects")), lit("."))),
+            (
+                2,
+                seq(
+                    lit("As an application, we deduce "),
+                    ref("relResult"),
+                    lit(" for "),
+                    plural(ref("mainObject")),
+                    lit("."),
+                ),
+            ),
+            (1, seq(lit("We hope to return to these questions in future work."))),
+            (
+                1,
+                seq(
+                    lit("Finally, we note that the "),
+                    pick("invariants"),
+                    lit(" of "),
+                    _sym,
+                    lit(" remains poorly understood."),
                 ),
             ),
         ]

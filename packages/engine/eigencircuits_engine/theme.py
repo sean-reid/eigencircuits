@@ -14,7 +14,6 @@ from .lexicon.fields.registry import weighted_fields
 from .lexicon.global_bank import (
     AGENCIES,
     FIRST_NAMES,
-    GRANT_CODES,
     INITIALS,
     INSTITUTIONS,
     SURNAMES,
@@ -248,9 +247,30 @@ def make_keywords(rng: Rng, field: SubfieldLexicon) -> list[str]:
 def make_funding(rng: Rng) -> str | None:
     if not rng.chance(0.6):
         return None
+    return f"This work was partially supported by {_funding_clause(rng)}."
+
+
+def _funding_clause(rng: Rng) -> str:
+    """A funding phrase whose grant code matches the agency's real format."""
     agency = rng.choice(AGENCIES)
-    code = rng.choice(GRANT_CODES)
-    return f"This work was partially supported by {agency} grant {code}."
+    if agency == "NSF":
+        return f"NSF grant DMS-{rng.int_in_range(1700000, 2499999)}"
+    if agency == "ERC":
+        return (
+            "the European Research Council under grant agreement no. "
+            f"{rng.int_in_range(640000, 949999)}"
+        )
+    if agency == "EPSRC":
+        return f"EPSRC grant EP/{chr(rng.int_in_range(78, 90))}{rng.int_in_range(100000, 999999)}/1"
+    if agency == "DFG":
+        return f"the DFG (project number {rng.int_in_range(100000, 499999)})"
+    if agency == "JSPS":
+        return (
+            f"JSPS KAKENHI grant JP{rng.int_in_range(18, 24):02d}K{rng.int_in_range(10000, 99999)}"
+        )
+    if agency == "NSERC":
+        return f"NSERC (RGPIN-{rng.int_in_range(2016, 2024)}-{rng.int_in_range(100000, 699999)})"
+    return f"the Simons Foundation (grant {rng.int_in_range(300000, 899999)})"
 
 
 def _sample(rng: Rng, pool: list[str], n: int) -> list[str]:

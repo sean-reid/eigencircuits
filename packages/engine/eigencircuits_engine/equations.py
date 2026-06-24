@@ -24,8 +24,12 @@ GENERIC_MOTIFS: tuple[str, ...] = (
 
 
 def build_eqn(ctx: GenContext, motif: str, display: bool) -> str:
+    # Shape-specific slots (a natural isomorphism / a natural map) must keep
+    # their form, so they bypass the free-form formula pools.
     pool = ctx.field.display_eqns if display else ctx.field.inline_eqns
-    if pool:
+    if motif in ("iso", "map"):
+        body = _generic(ctx, motif, ctx.symbols.assigned())
+    elif pool:
         body = _fill(ctx, _draw(ctx, list(pool), "__eqd__" if display else "__eqi__"))
     else:
         body = _generic(ctx, motif, ctx.symbols.assigned())
@@ -73,6 +77,8 @@ def _generic(ctx: GenContext, motif: str, roles: dict[str, str]) -> str:
         return rf"{x} = \sum_{{n \ge 1}} \frac{{a_n}}{{n^{{s}}}}"
     if motif == "iso":
         return rf"{x} \cong {b}" if b != x else rf"{x} \cong H^{{1}}({x})"
+    if motif == "map":
+        return rf"{x} \to {b}" if b != x else rf"{x} \to H^{{1}}({x})"
     if motif == "exactSeq":
         return rf"0 \to A \to {x} \to B \to 0"
     if motif == "eigen":

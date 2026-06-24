@@ -112,9 +112,32 @@ def expand(node: GNode, ctx: GenContext) -> str:
 
 
 def _choose(node: Choice, ctx: GenContext) -> GNode:
+    options = node.options
     if ctx.depth >= SOFT_MAX_DEPTH and node.terminal is not None:
-        return node.options[node.terminal][1]
-    return ctx.rng.pick_weighted(node.options)
+        return options[node.terminal][1]
+    if len(options) == 1:
+        return options[0][1]
+    # Avoid repeating the same production this node produced last time, so
+    # reused nonterminals (Conclusion, ProofStep, ...) vary instead of looping.
+    last = ctx.choice_last.get(id(node), -1)
+    index = _weighted_index(options, ctx)
+    tries = 0
+    while index == last and tries < 2:
+        index = _weighted_index(options, ctx)
+        tries += 1
+    ctx.choice_last[id(node)] = index
+    return options[index][1]
+
+
+def _weighted_index(options: tuple[tuple[float, GNode], ...], ctx: GenContext) -> int:
+    total = sum(w for w, _ in options)
+    r = ctx.rng.random() * total
+    upto = 0.0
+    for i, (weight, _) in enumerate(options):
+        upto += weight
+        if r < upto:
+            return i
+    return len(options) - 1
 
 
 def _expand_rep(node: Rep, ctx: GenContext) -> str:
@@ -176,13 +199,18 @@ def _cite(ctx: GenContext, node: Cite) -> str:
     if not labels:
         return ""
     k = ctx.rng.int_in_range(node.lo, min(node.hi, len(labels)))
+    recent = ctx.recent.setdefault("__cite__", [])
     chosen: list[str] = []
     guard = 0
-    while len(chosen) < k and guard < 50:
+    while len(chosen) < k and guard < 60:
         candidate = ctx.rng.choice(labels)
-        if candidate not in chosen:
+        # Avoid duplicates within this citation and labels cited just before.
+        if candidate not in chosen and (candidate not in recent or len(labels) <= len(recent) + k):
             chosen.append(candidate)
         guard += 1
+    recent.extend(chosen)
+    while len(recent) > 4:
+        recent.pop(0)
     chosen.sort(key=lambda s: (len(s), s))
     return "[" + ", ".join(chosen) + "]"
 

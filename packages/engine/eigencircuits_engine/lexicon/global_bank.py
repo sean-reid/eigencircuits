@@ -728,22 +728,24 @@ PROOF_CONNECTIVES: tuple[str, ...] = (
     "A routine verification shows that",
 )
 
-# Proof openers, varied so a single paper does not repeat the same one.
+# Proof openers, varied so a single paper does not repeat the same one. Kept
+# neutral: none promises a structure (cases, two inclusions, a contradiction)
+# that the body does not deliver.
 PROOF_OPENERS: tuple[str, ...] = (
     "We argue by induction on the relevant invariant.",
     "The proof relies on the construction introduced above.",
     "We may assume without loss of generality that the normalization holds.",
     "Fix the data as above.",
-    "The argument is by contradiction.",
     "We proceed in several steps.",
-    "After reducing to the local case, the claim follows.",
-    "We first treat the case of small rank.",
+    "After reducing to the local case, the argument is standard.",
     "The key point is a dimension count.",
     "We adapt the strategy of the previous section.",
-    "Both inclusions are proved separately.",
     "The proof is a routine diagram chase.",
     "We exhibit the required object explicitly.",
-    "By duality, it suffices to treat one case.",
+    "By duality, it suffices to treat the generic case.",
+    "We combine the preceding lemmas.",
+    "We record the relevant estimates.",
+    "We follow the standard strategy.",
 )
 
 # Proof closers.
