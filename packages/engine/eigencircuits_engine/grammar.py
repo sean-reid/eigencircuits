@@ -77,7 +77,7 @@ GRAMMAR: Grammar = {
             (2, seq(_plural_central, lit(" and "), plural(pick("objects")))),
             (1, seq(lit("towards "), ref("relResult"), lit(" for "), plural(ref("mainObject")))),
             (2, seq(plural(ref("mainObject")), lit(" via "), ref("method"))),
-            (1, seq(lit("a "), pick("props"), lit(" approach to "), ref("relResult"))),
+            (1, seq(article(seq(pick("props"), lit(" approach"))), lit(" to "), ref("relResult"))),
         ]
     ),
     # --------------------------------------------------------------- abstract
@@ -205,10 +205,27 @@ GRAMMAR: Grammar = {
         ]
     ),
     # --------------------------------------------------- theorem environments
+    # The central object is introduced in the abstract and the intro; body
+    # statements mostly refer to it by symbol or "as above" rather than
+    # restating the full "{adj} {object}" phrase, as real papers do.
     "TheoremStmt": choice(
         [
             (
                 3,
+                seq(
+                    lit("Suppose that "),
+                    nt("Hypothesis"),
+                    lit(". Then "),
+                    nt("Conclusion"),
+                    opt(0.35, seq(lit(", and moreover "), nt("Conclusion"))),
+                    lit("."),
+                ),
+            ),
+            (3, seq(lit("With the notation above, "), nt("Conclusion"), lit("."))),
+            (2, seq(lit("Let "), _sym, lit(" be as above. Then "), nt("Conclusion"), lit("."))),
+            (2, seq(lit("If "), nt("Hypothesis"), lit(", then "), nt("Conclusion"), lit("."))),
+            (
+                1,
                 seq(
                     lit("Let "),
                     _sym,
@@ -216,17 +233,6 @@ GRAMMAR: Grammar = {
                     _a_central,
                     lit(". Then "),
                     nt("Conclusion"),
-                    lit("."),
-                ),
-            ),
-            (
-                2,
-                seq(
-                    lit("Suppose that "),
-                    nt("Hypothesis"),
-                    lit(". Then "),
-                    nt("Conclusion"),
-                    opt(0.4, seq(lit(", and moreover "), nt("Conclusion"))),
                     lit("."),
                 ),
             ),
@@ -248,18 +254,9 @@ GRAMMAR: Grammar = {
     ),
     "LemmaStmt": choice(
         [
-            (
-                3,
-                seq(
-                    lit("Let "),
-                    _sym,
-                    lit(" be "),
-                    _a_central,
-                    lit(". Then "),
-                    _inline_eqn,
-                    lit("."),
-                ),
-            ),
+            (3, seq(lit("With the notation above, "), _inline_eqn, lit("."))),
+            (2, seq(lit("We have "), _inline_eqn, lit("."))),
+            (2, seq(lit("Suppose that "), nt("Hypothesis"), lit(". Then "), _inline_eqn, lit("."))),
             (
                 2,
                 seq(
@@ -269,6 +266,18 @@ GRAMMAR: Grammar = {
                     article(seq(pick("props"), lit(" "), pick("objects"))),
                     lit(" such that "),
                     nt("Conclusion"),
+                    lit("."),
+                ),
+            ),
+            (
+                1,
+                seq(
+                    lit("Let "),
+                    _sym,
+                    lit(" be "),
+                    _a_central,
+                    lit(". Then "),
+                    _inline_eqn,
                     lit("."),
                 ),
             ),
@@ -366,20 +375,82 @@ GRAMMAR: Grammar = {
             ),
             (2, seq(lit("the "), pick("invariants"), lit(" of "), _sym, lit(" is finite"))),
             (2, seq(_sym, lit(" is determined by its "), pick("invariants"))),
+            (2, seq(_sym, lit(" admits "), article(seq(pick("props"), lit(" "), pick("objects"))))),
+            (
+                2,
+                seq(
+                    lit("the "),
+                    pick("invariants"),
+                    lit(" of "),
+                    _sym,
+                    lit(" coincides with the "),
+                    pick("invariants"),
+                    lit(" of "),
+                    article(seq(pick("props"), lit(" "), pick("objects"))),
+                ),
+            ),
+            (
+                2,
+                seq(
+                    lit("every "),
+                    pick("props"),
+                    lit(" "),
+                    pick("objects"),
+                    lit(" arises from "),
+                    _sym,
+                ),
+            ),
+            (1, seq(_sym, lit(" is "), pick("props"))),
+            (
+                1,
+                seq(
+                    lit("the natural map "),
+                    _iso_eqn,
+                    lit(" is "),
+                    choice(
+                        [(1, lit("surjective")), (1, lit("injective")), (1, lit("an isomorphism"))]
+                    ),
+                ),
+            ),
+            (
+                1,
+                seq(
+                    lit("the "),
+                    pick("invariants"),
+                    lit(" of "),
+                    _sym,
+                    lit(" does not depend on the choice of "),
+                    pick("objects"),
+                ),
+            ),
         ]
     ),
     "Hypothesis": choice(
         [
-            (3, seq(_sym, lit(" is "), _a_central)),
-            (2, seq(_sym, lit(" is "), pick("props"), lit(" and "), pick("props"))),
-            (1, seq(lit("the "), ref("invariant"), lit(" of "), _sym, lit(" is finite"))),
+            (1, seq(_sym, lit(" is "), _a_central)),
+            (3, seq(_sym, lit(" is "), pick("props"), lit(" and "), pick("props"))),
+            (2, seq(_sym, lit(" is "), pick("props"))),
+            (
+                2,
+                seq(
+                    lit("the "),
+                    ref("invariant"),
+                    lit(" of "),
+                    _sym,
+                    lit(" is "),
+                    choice([(1, lit("finite")), (1, lit("nonzero")), (1, lit("bounded"))]),
+                ),
+            ),
+            (1, seq(_inline_eqn, lit(" holds"))),
         ]
     ),
     "Condition": choice(
         [
             (2, seq(_inline_eqn, lit(" holds for all "), plural(pick("objects")))),
             (2, seq(lit("the "), pick("invariants"), lit(" of "), _sym, lit(" vanishes"))),
+            (2, seq(_sym, lit(" is "), pick("props"), lit(" and "), pick("props"))),
             (1, seq(_sym, lit(" is "), pick("props"))),
+            (1, seq(lit("the associated "), pick("objects"), lit(" is "), pick("props"))),
         ]
     ),
     # --------------------------------------------------------------- proofs
@@ -391,7 +462,8 @@ GRAMMAR: Grammar = {
             (2, seq(lit("By "), cite(1, 1), lit(", "), nt("Conclusion"), lit("."))),
             (1, seq(lit("As shown in "), cite(1, 1), lit(", "), nt("Conclusion"), lit("."))),
             (1, seq(lit("A short computation gives "), _inline_eqn, lit("."))),
-            (1, seq(lit("Passing to a subsequence, we may assume "), nt("Conclusion"), lit("."))),
+            (1, seq(lit("After a harmless reduction, we may assume "), nt("Conclusion"), lit("."))),
+            (1, seq(lit("It remains to verify that "), nt("Conclusion"), lit("."))),
         ]
     ),
     # ------------------------------------------------------- introduction moves

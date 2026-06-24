@@ -49,7 +49,11 @@ _ENV_NAMES = {
 
 def to_latex(model: PaperModel) -> str:
     out: list[str] = [_preamble(model.style.numbering == "section")]
-    out.append(f"\\title{{{model.title}}}")
+    short = _short_title(model.title)
+    if short != model.title:
+        out.append(f"\\title[{short}]{{{model.title}}}")
+    else:
+        out.append(f"\\title{{{model.title}}}")
     for author in model.authors:
         out.append(f"\\author{{{author.name}}}")
     if len(model.affiliations) == 1:
@@ -97,6 +101,27 @@ def to_latex(model: PaperModel) -> str:
     out.append("")
     out.append(r"\end{document}")
     return "\n".join(out)
+
+
+def _short_title(title: str, limit: int = 45) -> str:
+    """A running-head-safe abbreviation of a long title, kept on word and math
+    boundaries so ``$...$`` is never split."""
+    if len(title) <= limit:
+        return title
+    words = title.split()
+    out: list[str] = []
+    length = 0
+    for word in words:
+        if length + len(word) + 1 > limit:
+            break
+        out.append(word)
+        length += len(word) + 1
+    while out and "".join(out).count("$") % 2 == 1:
+        out.pop()
+    _trailing = {"the", "a", "an", "of", "to", "for", "and", "on", "in", "via", "with"}
+    while out and out[-1].lower() in _trailing:
+        out.pop()
+    return " ".join(out) if out else title[:limit]
 
 
 def _render_block(block: object) -> str:

@@ -14,7 +14,7 @@ def test_latex_has_required_structure(seed: str) -> None:
     tex = to_latex(generate(seed))
     for marker in (
         r"\documentclass[11pt]{amsart}",
-        r"\title{",
+        r"\title",
         r"\begin{document}",
         r"\maketitle",
         r"\begin{abstract}",

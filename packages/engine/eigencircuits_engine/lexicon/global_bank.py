@@ -439,6 +439,47 @@ PROOF_CONNECTIVES: tuple[str, ...] = (
     "By a standard argument,",
     "A direct computation shows that",
     "Combining the above,",
+    "In particular,",
+    "Consequently,",
+    "On the other hand,",
+    "Moreover,",
+    "Hence,",
+    "It remains to show that",
+    "We claim that",
+    "After unwinding the definitions,",
+    "Arguing as before,",
+    "In view of the above,",
+    "Therefore,",
+    "A routine verification shows that",
+)
+
+# Proof openers, varied so a single paper does not repeat the same one.
+PROOF_OPENERS: tuple[str, ...] = (
+    "We argue by induction on the relevant invariant.",
+    "The proof relies on the construction introduced above.",
+    "We may assume without loss of generality that the normalization holds.",
+    "Fix the data as above.",
+    "The argument is by contradiction.",
+    "We proceed in several steps.",
+    "After reducing to the local case, the claim follows.",
+    "We first treat the case of small rank.",
+    "The key point is a dimension count.",
+    "We adapt the strategy of the previous section.",
+    "Both inclusions are proved separately.",
+    "The proof is a routine diagram chase.",
+    "We exhibit the required object explicitly.",
+    "By duality, it suffices to treat one case.",
+)
+
+# Proof closers.
+PROOF_CLOSERS: tuple[str, ...] = (
+    "This completes the proof.",
+    "as desired.",
+    "which is what we wanted.",
+    "The result now follows.",
+    "This proves the claim.",
+    "The remaining case is entirely analogous.",
+    "completing the argument.",
 )
 
 HEDGES: tuple[str, ...] = (

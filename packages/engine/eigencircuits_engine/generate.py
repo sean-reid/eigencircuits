@@ -19,7 +19,9 @@ from .lexicon.global_bank import (
     HEDGES,
     INITIALS,
     JOURNALS,
+    PROOF_CLOSERS,
     PROOF_CONNECTIVES,
+    PROOF_OPENERS,
     PUBLISHERS,
     SURNAMES,
 )
@@ -49,19 +51,6 @@ from .types import (
     Reference,
     Scope,
     SectionModel,
-)
-
-_PROOF_OPENS = (
-    "We argue by induction on the relevant invariant.",
-    "The proof relies on the construction introduced above.",
-    "We may assume without loss of generality that the normalization holds.",
-    "Fix the data as above.",
-)
-_PROOF_CLOSES = (
-    "This completes the proof.",
-    "as desired.",
-    "which is what we wanted.",
-    "The result now follows.",
 )
 
 
@@ -272,10 +261,19 @@ def _env(ctx: GenContext, env: str, stmt: str) -> EnvBlock:
 
 
 def _proof(ctx: GenContext) -> str:
-    parts = [ctx.rng.choice(_PROOF_OPENS)]
-    for _ in range(ctx.rng.int_in_range(2, 4)):
+    parts: list[str] = []
+    # Open with a distinct opener (most of the time), not seen yet in this paper.
+    if ctx.rng.chance(0.8):
+        used = ctx.recent.setdefault("__open__", [])
+        for _ in range(6):
+            opener = ctx.rng.choice(PROOF_OPENERS)
+            if opener not in used:
+                used.append(opener)
+                parts.append(opener)
+                break
+    for _ in range(ctx.rng.int_in_range(2, 5)):
         parts.append(expand(NT("ProofStep"), ctx))
-    parts.append(ctx.rng.choice(_PROOF_CLOSES))
+    parts.append(ctx.rng.choice(PROOF_CLOSERS))
     return finalize(" ".join(parts))
 
 
