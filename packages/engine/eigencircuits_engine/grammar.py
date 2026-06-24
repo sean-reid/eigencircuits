@@ -445,13 +445,25 @@ GRAMMAR: Grammar = {
             (1, seq(_inline_eqn, lit(" holds"))),
         ]
     ),
+    # Used only inside definitions, so the condition refers to the object being
+    # defined ("it"/"its"), never the paper's main object.
     "Condition": choice(
         [
-            (2, seq(_inline_eqn, lit(" holds for all "), plural(pick("objects")))),
-            (2, seq(lit("the "), pick("invariants"), lit(" of "), _sym, lit(" vanishes"))),
-            (2, seq(_sym, lit(" is "), pick("props"), lit(" and "), pick("props"))),
-            (1, seq(_sym, lit(" is "), pick("props"))),
+            (3, seq(lit("it is "), pick("props"), lit(" and "), pick("props"))),
+            (
+                2,
+                seq(
+                    lit("its "),
+                    pick("invariants"),
+                    choice(
+                        [(1, lit(" vanishes")), (1, lit(" is finite")), (1, lit(" is trivial"))]
+                    ),
+                ),
+            ),
+            (2, seq(lit("it is "), pick("props"))),
+            (2, seq(lit("it admits "), article(seq(pick("props"), lit(" "), pick("objects"))))),
             (1, seq(lit("the associated "), pick("objects"), lit(" is "), pick("props"))),
+            (1, seq(_inline_eqn, lit(" holds"))),
         ]
     ),
     # --------------------------------------------------------------- proofs

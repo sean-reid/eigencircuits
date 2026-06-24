@@ -190,14 +190,18 @@ def _intro_section(ctx: GenContext, heading: str, outline: str) -> SectionModel:
     blocks.append(Para(finalize(opener)))
     blocks.append(Para(finalize(expand(NT("IntroThisPaper"), ctx))))
 
+    # A normal numbered theorem (amsthm renders it "Theorem 1.1"), optionally
+    # named, so later "by Theorem 1.1" references resolve in the compiled PDF.
+    main_number = _item_number(ctx)
     blocks.append(
         EnvBlock(
             env="Theorem",
-            number="A",
+            number=main_number,
             name="Main Theorem" if ctx.rng.chance(0.3) else None,
             text=finalize(expand(NT("TheoremStmt"), ctx)),
         )
     )
+    ctx.int_refs.append(f"Theorem {main_number}")
     blocks.append(Para(finalize(expand(NT("IntroStrategy"), ctx))))
     blocks.append(Para(outline))
 
@@ -271,8 +275,13 @@ def _theorem_like(ctx: GenContext, blocks: list[Block]) -> None:
     env = ctx.rng.pick_weighted([(3.0, "Theorem"), (2.0, "Proposition"), (3.0, "Lemma")])
     stmt = "LemmaStmt" if env == "Lemma" else "TheoremStmt"
     number = _item_number(ctx)
-    blocks.append(EnvBlock(env=env, number=number, text=finalize(expand(NT(stmt), ctx))))
-    blocks.append(ProofBlock(text=_proof(ctx)))
+    statement = finalize(expand(NT(stmt), ctx))
+    # Build the proof before registering this result, so a proof never cites the
+    # statement it is proving (only earlier equations and results).
+    proof = _proof(ctx)
+    blocks.append(EnvBlock(env=env, number=number, text=statement))
+    blocks.append(ProofBlock(text=proof))
+    ctx.int_refs.append(f"{env} {number}")
 
 
 def _env(ctx: GenContext, env: str, stmt: str) -> EnvBlock:
@@ -295,9 +304,32 @@ def _proof(ctx: GenContext) -> str:
                 parts.append(opener)
                 break
     for _ in range(ctx.rng.int_in_range(2, 5)):
-        parts.append(expand(NT("ProofStep"), ctx))
+        # Sometimes cite an earlier equation or result, as real proofs do.
+        if ctx.int_refs and ctx.rng.chance(0.35):
+            parts.append(_cross_ref_step(ctx))
+        else:
+            parts.append(expand(NT("ProofStep"), ctx))
     parts.append(ctx.rng.choice(PROOF_CLOSERS))
     return finalize(" ".join(parts))
+
+
+def _cross_ref_step(ctx: GenContext) -> str:
+    conclusion = expand(NT("Conclusion"), ctx)
+    refs = ctx.int_refs
+    if len(refs) >= 2 and ctx.rng.chance(0.4):
+        a = ctx.rng.choice(refs)
+        b = ctx.rng.choice(refs)
+        for _ in range(4):
+            if b != a:
+                break
+            b = ctx.rng.choice(refs)
+        if b != a:
+            return f"Combining {a} and {b}, {conclusion}."
+    ref = ctx.rng.choice(refs)
+    lead = ctx.rng.choice(
+        (f"By {ref}, ", f"Using {ref}, ", f"It follows from {ref} that ", f"In view of {ref}, ")
+    )
+    return f"{lead}{conclusion}."
 
 
 def _display_equation(ctx: GenContext) -> EquationBlock | None:
@@ -307,7 +339,9 @@ def _display_equation(ctx: GenContext) -> EquationBlock | None:
         tex = expand(NT("DisplayEqn"), ctx).strip().strip("$").strip()
         if tex not in used:
             used.append(tex)
-            return EquationBlock(tex=tex, number=_eq_number(ctx))
+            number = _eq_number(ctx)
+            ctx.int_refs.append(f"({number})")
+            return EquationBlock(tex=tex, number=number)
     return None
 
 
