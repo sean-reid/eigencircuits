@@ -88,8 +88,8 @@ GRAMMAR: Grammar = {
         nt("AbstractMethod"),
         lit(" "),
         nt("AbstractResult"),
-        opt(0.6, seq(lit(" "), nt("AbstractApplication"))),
-        opt(0.5, seq(lit(" "), nt("AbstractPositioning"))),
+        opt(0.75, seq(lit(" "), nt("AbstractApplication"))),
+        opt(0.65, seq(lit(" "), nt("AbstractPositioning"))),
     ),
     "AbstractTopic": choice(
         [

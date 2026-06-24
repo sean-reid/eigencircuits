@@ -202,6 +202,9 @@ def _intro_section(ctx: GenContext, heading: str, outline: str) -> SectionModel:
         )
     )
     ctx.int_refs.append(f"Theorem {main_number}")
+    if ctx.rng.chance(0.35):
+        blocks.append(Para("We also obtain the following consequence."))
+        blocks.append(_env(ctx, "Corollary", "CorollaryStmt"))
     blocks.append(Para(finalize(expand(NT("IntroStrategy"), ctx))))
     blocks.append(Para(outline))
 
@@ -232,6 +235,7 @@ def _core_section(ctx: GenContext, heading: str) -> SectionModel:
     if ctx.rng.chance(0.55):
         equation = _display_equation(ctx)
         if equation is not None:
+            blocks.append(Para(ctx.rng.choice(_EQN_LEADS)))
             blocks.append(equation)
     if ctx.rng.chance(0.4):
         blocks.append(_env(ctx, "Example", "ExampleStmt"))
@@ -242,6 +246,42 @@ def _core_section(ctx: GenContext, heading: str) -> SectionModel:
 
 
 _FINAL_HEADINGS = ("Concluding remarks", "Final remarks", "Applications", "Further questions")
+
+# Lead-ins so a displayed equation is introduced rather than left floating.
+_EQN_LEADS = (
+    "We record the following identity.",
+    "Recall the following relation.",
+    "The main computation is summarized below.",
+    "We will make repeated use of the identity below.",
+    "It is convenient to record the following.",
+    "The starting point is the following relation.",
+    "A direct computation yields the following.",
+    "The key estimate reads as follows.",
+    "We have the following explicit formula.",
+    "Recall that one has the following.",
+    "The following identity will be used repeatedly.",
+    "We summarize the relevant relation below.",
+    "This leads to the following expression.",
+    "We obtain the following closed form.",
+    "The relevant identity is the following.",
+    "One verifies the following relation.",
+    "We now state the underlying identity.",
+    "The proof hinges on the following formula.",
+    "We isolate the following relation for later use.",
+    "Concretely, we have the following.",
+    "It will be useful to recall the following.",
+    "The construction yields the following identity.",
+    "We collect the relevant formula below.",
+    "For convenience we record the following.",
+    "The following relation plays a central role.",
+    "We shall need the following identity.",
+    "This may be rewritten as follows.",
+    "The above specializes to the following.",
+    "Unwinding the definitions gives the following.",
+    "We are led to the following identity.",
+    "Our analysis produces the following relation.",
+    "The following will be needed in the sequel.",
+)
 
 
 def _final_section(ctx: GenContext, heading: str) -> SectionModel:
@@ -436,14 +476,27 @@ def _title(ctx: GenContext) -> str:
     return titlecase(raw) if ctx.style.caps == "title" else cap_first(raw)
 
 
+def _bound(ctx: GenContext, name: str, bank: str) -> str:
+    found = ctx.lookup(name)
+    return found.text if found is not None else ctx.rng.choice(ctx.field.bank(bank))
+
+
 def _core_heading(ctx: GenContext) -> str:
-    inv = ctx.rng.choice(ctx.field.bank("invariants"))
-    obj = ctx.rng.choice(ctx.field.bank("objects"))
+    # Headings stay on the paper's topic: mostly the main object and the bound
+    # invariant, occasionally a related object for variety.
+    main = _bound(ctx, "mainObject", "objects")
+    obj = main if ctx.rng.chance(0.7) else ctx.rng.choice(ctx.field.bank("objects"))
+    inv = (
+        _bound(ctx, "invariant", "invariants")
+        if ctx.rng.chance(0.6)
+        else ctx.rng.choice(ctx.field.bank("invariants"))
+    )
     template = ctx.rng.pick_weighted(
         [
             (3.0, f"The {inv} of {pluralize(obj)}"),
             (2.0, f"Construction of the {obj}"),
             (2.0, "Proof of the main theorem"),
+            (2.0, f"Basic properties of {pluralize(obj)}"),
             (1.0, f"{cap_first(inv)} estimates"),
             (1.0, f"Applications to {pluralize(obj)}"),
         ]
@@ -456,8 +509,13 @@ def _plan_headings(
 ) -> list[str]:
     headings = ["Introduction"]
     if has_prelim:
-        prelim = cap_first(
-            f"Preliminaries on {pluralize(ctx.rng.choice(ctx.field.bank('objects')))}"
+        main = pluralize(_bound(ctx, "mainObject", "objects"))
+        prelim = ctx.rng.choice(
+            (
+                cap_first(f"Preliminaries on {main}"),
+                "Notation and conventions",
+                cap_first(f"Background on {main}"),
+            )
         )
         headings.append(prelim)
     used = {h.lower() for h in headings}
