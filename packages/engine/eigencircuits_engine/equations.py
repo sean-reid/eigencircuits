@@ -8,6 +8,8 @@ generic, parametrized motif set is the fallback for fields without pools.
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from .types import GenContext
 
 GENERIC_MOTIFS: tuple[str, ...] = (
@@ -38,7 +40,11 @@ def build_eqn(ctx: GenContext, motif: str, display: bool) -> str:
 
 
 def _draw(ctx: GenContext, pool: list[str], key: str) -> str:
-    """Pick a template not used yet in this paper; reset the memory if exhausted."""
+    """Pick a template not used yet in this paper; reset the memory if exhausted.
+
+    De-duplication is on the raw template, so each structural shape appears at
+    most once per paper while the randomized fill varies it from paper to paper.
+    """
     used = ctx.recent.setdefault(key, [])
     for _ in range(10):
         choice = pool[ctx.rng.int_in_range(0, len(pool) - 1)]
@@ -49,12 +55,35 @@ def _draw(ctx: GenContext, pool: list[str], key: str) -> str:
     return pool[ctx.rng.int_in_range(0, len(pool) - 1)]
 
 
+_PRIMES = (2, 3, 5, 7, 11, 13)
+
+
 def _fill(ctx: GenContext, template: str) -> str:
+    """Substitute symbols (XSYM/ASYM/BSYM) and randomized numeric tokens.
+
+    Each token gets a single value per call, so repeated tokens in one formula
+    stay consistent while the formula varies across papers.
+    """
+    rng = ctx.rng
     x = ctx.symbols.get("mainObject", ctx.rng)
+    others = [s for s in ctx.field.symbols if s != x] or ["Y", "Z"]
     body = template.replace("XSYM", x)
     if "ASYM" in body:
-        syms = [s for s in ctx.field.symbols if s != x] or list(ctx.field.symbols) or ["Y"]
-        body = body.replace("ASYM", syms[ctx.rng.int_in_range(0, len(syms) - 1)])
+        body = body.replace("ASYM", others[rng.int_in_range(0, len(others) - 1)])
+    if "BSYM" in body:
+        rest = [s for s in others if s + "$" not in body] or others
+        body = body.replace("BSYM", rest[rng.int_in_range(0, len(rest) - 1)])
+    tokens: dict[str, Callable[[], int]] = {
+        "@K@": lambda: rng.int_in_range(2, 6),
+        "@I@": lambda: rng.int_in_range(1, 3),
+        "@N@": lambda: rng.int_in_range(2, 9),
+        "@P@": lambda: _PRIMES[rng.int_in_range(0, len(_PRIMES) - 1)],
+        "@R@": lambda: rng.int_in_range(0, 3),
+        "@C@": lambda: rng.int_in_range(2, 5),
+    }
+    for token, make in tokens.items():
+        if token in body:
+            body = body.replace(token, str(make()))
     return body
 
 

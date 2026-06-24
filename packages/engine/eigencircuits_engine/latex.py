@@ -59,14 +59,17 @@ def to_latex(model: PaperModel) -> str:
         out.append(f"\\title{{{model.title}}}")
     for author in model.authors:
         out.append(f"\\author{{{author.name}}}")
+    multi = len(model.authors) > 1
     if len(model.affiliations) == 1:
-        # All authors share one institution: print it once, emails stacked.
+        # Shared institution: print it once, then one email per author. With
+        # several authors the name is attached so each email stays attributed.
         out.append(f"\\address{{{model.affiliations[0]}}}")
         for author in model.authors:
             if author.email:
-                out.append(f"\\email{{{author.email}}}")
+                prefix = f"({author.name}) " if multi else ""
+                out.append(f"\\email{{{prefix}{author.email}}}")
     else:
-        # Distinct institutions: attribute each with a single author name.
+        # Distinct institutions: each author's own address and email, attributed.
         for author in model.authors:
             out.append(f"\\address{{({author.name}) {model.affiliations[author.affiliation]}}}")
             if author.email:
