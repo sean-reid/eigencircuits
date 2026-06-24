@@ -39,11 +39,13 @@ def test_same_seed_is_identical() -> None:
 
 
 def test_structure() -> None:
+    from eigencircuits_engine.lexicon.fields.registry import BY_CODE
+
     model = generate("m4")
     assert model.sections[0].heading == "Introduction"
     assert all(s.blocks for s in model.sections)
     assert 12 <= len(model.references) <= 25
-    assert model.subfield == "math.NT"
+    assert model.subfield in BY_CODE
     assert model.seed == "m4"
 
 

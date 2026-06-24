@@ -11,6 +11,8 @@ def _preamble(section_numbered: bool) -> str:
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{stmaryrd}
 """
     if section_numbered:
         thm = r"\newtheorem{theorem}{Theorem}[section]"

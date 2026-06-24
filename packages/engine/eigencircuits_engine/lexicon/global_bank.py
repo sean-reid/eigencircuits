@@ -748,7 +748,7 @@ PROOF_OPENERS: tuple[str, ...] = (
     "We follow the standard strategy.",
 )
 
-# Proof closers.
+# Proof closers (deduplicated within a paper so consecutive proofs differ).
 PROOF_CLOSERS: tuple[str, ...] = (
     "This completes the proof.",
     "as desired.",
@@ -757,6 +757,16 @@ PROOF_CLOSERS: tuple[str, ...] = (
     "This proves the claim.",
     "The remaining case is entirely analogous.",
     "completing the argument.",
+    "as required.",
+    "which establishes the assertion.",
+    "This finishes the proof.",
+    "The proof is complete.",
+    "and the statement follows.",
+    "which proves the proposition.",
+    "as claimed.",
+    "This is what we set out to show.",
+    "The general case is similar.",
+    "and we are done.",
 )
 
 HEDGES: tuple[str, ...] = (

@@ -73,9 +73,9 @@ def generate(seed: str | int | None = None) -> PaperModel:
     ctx.cite_labels = [r.label for r in references]
 
     core_count = {
-        "note": rng.int_in_range(1, 2),
-        "standard": rng.int_in_range(3, 4),
-        "long": rng.int_in_range(5, 7),
+        "note": rng.int_in_range(2, 3),
+        "standard": rng.int_in_range(4, 5),
+        "long": rng.int_in_range(6, 8),
     }[style.length_class]
     has_prelim = style.length_class != "note" and rng.chance(0.85)
     has_final = rng.chance(0.6)
@@ -228,9 +228,9 @@ def _core_section(ctx: GenContext, heading: str) -> SectionModel:
         blocks.append(_env(ctx, "Definition", "DefinitionStmt"))
         if ctx.rng.chance(0.4):
             blocks.append(Para(finalize(expand(NT("RemarkStmt"), ctx))))
-    for i in range(ctx.rng.int_in_range(1, 3)):
+    for i in range(ctx.rng.int_in_range(2, 3)):
         _theorem_like(ctx, blocks)
-        if i == 0 and ctx.rng.chance(0.3):
+        if i == 0 and ctx.rng.chance(0.35):
             blocks.append(_env(ctx, "Corollary", "CorollaryStmt"))
     if ctx.rng.chance(0.55):
         equation = _display_equation(ctx)
@@ -349,7 +349,7 @@ def _proof(ctx: GenContext) -> str:
             parts.append(_cross_ref_step(ctx))
         else:
             parts.append(expand(NT("ProofStep"), ctx))
-    parts.append(ctx.rng.choice(PROOF_CLOSERS))
+    parts.append(_fresh(ctx, "__close__", PROOF_CLOSERS))
     return finalize(" ".join(parts))
 
 
@@ -477,15 +477,17 @@ def _title(ctx: GenContext) -> str:
 
 
 def _fresh(ctx: GenContext, key: str, pool: tuple[str, ...]) -> str:
-    """Pick an item not yet used in this paper under ``key``; reset if exhausted."""
+    """Pick an item not used yet in this paper under ``key``.
+
+    When the pool is exhausted it resets but keeps the most recent item
+    excluded, so the same item never appears twice in a row even across a reset.
+    """
     used = ctx.recent.setdefault(key, [])
-    for _ in range(8):
-        choice = pool[ctx.rng.int_in_range(0, len(pool) - 1)]
-        if choice not in used:
-            used.append(choice)
-            return choice
-    used.clear()
-    choice = pool[ctx.rng.int_in_range(0, len(pool) - 1)]
+    candidates = [c for c in pool if c not in used]
+    if not candidates:
+        used[:] = used[-1:]
+        candidates = [c for c in pool if c not in used]
+    choice = candidates[ctx.rng.int_in_range(0, len(candidates) - 1)]
     used.append(choice)
     return choice
 

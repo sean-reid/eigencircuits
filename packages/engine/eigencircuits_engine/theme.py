@@ -51,7 +51,7 @@ def rng_choice(ctx: GenContext, bank: str) -> str:
 
 
 def make_style(rng: Rng) -> PaperStyle:
-    length_class = rng.pick_weighted([(2.0, "note"), (5.0, "standard"), (2.0, "long")])
+    length_class = rng.pick_weighted([(1.5, "note"), (5.0, "standard"), (3.5, "long")])
     numbering = "section" if length_class != "note" or rng.chance(0.5) else "doc"
     citations = "alpha" if rng.chance(0.5) else "numeric"
     caps = "title" if rng.chance(0.5) else "sentence"
