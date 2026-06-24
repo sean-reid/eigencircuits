@@ -12,6 +12,7 @@ from .types import (
     NT,
     Bind,
     Choice,
+    Cite,
     Eqn,
     GNode,
     Lit,
@@ -101,3 +102,7 @@ def sym(role: str) -> Sym:
 
 def refnum(counter: str, key: str | None = None) -> RefNum:
     return RefNum(counter, key)
+
+
+def cite(lo: int = 1, hi: int = 2) -> Cite:
+    return Cite(lo, hi)

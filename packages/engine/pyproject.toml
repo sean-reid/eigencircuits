@@ -24,6 +24,8 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+# En-dash is correct typography in names like "Wisconsin–Madison".
+allowed-confusables = ["–"]
 
 [tool.mypy]
 python_version = "3.11"

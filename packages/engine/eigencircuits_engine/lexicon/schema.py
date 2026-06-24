@@ -36,6 +36,7 @@ class SubfieldLexicon:
     banks: Mapping[str, Sequence[str]]
     symbols: Sequence[str]  # KaTeX-safe math symbols, e.g. ["p", "\\zeta(s)", ...]
     eqn_motif: Callable[[SymRoles], str]  # signature displayed formula
+    msc: Sequence[str] = field(default_factory=tuple)  # MSC 2020 codes, primary first
     adjacent: Sequence[str] = field(default_factory=tuple)  # codes for ~10% cross-listing
 
     def bank(self, name: str) -> Sequence[str]:

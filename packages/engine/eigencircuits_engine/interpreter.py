@@ -17,6 +17,7 @@ from .types import (
     Bind,
     BoundValue,
     Choice,
+    Cite,
     Eqn,
     GenContext,
     GNode,
@@ -104,6 +105,9 @@ def expand(node: GNode, ctx: GenContext) -> str:
     if isinstance(node, RefNum):
         return _refnum(ctx, node)
 
+    if isinstance(node, Cite):
+        return _cite(ctx, node)
+
     raise GenerationError(f"unknown node {node!r}")
 
 
@@ -124,9 +128,9 @@ def _expand_rep(node: Rep, ctx: GenContext) -> str:
 
 
 def _pick_bank(ctx: GenContext, bank: str) -> str:
-    items = ctx.field.bank(bank)
+    items = ctx.field.banks.get(bank) or ctx.extra.get(bank)
     if not items:
-        raise GenerationError(f"empty bank {bank!r} in {ctx.field.code}")
+        raise GenerationError(f"empty or unknown bank {bank!r} in {ctx.field.code}")
     recent = ctx.recent.setdefault(bank, [])
     selected = ctx.rng.choice(items)
     tries = 0
@@ -165,6 +169,22 @@ def _refnum(ctx: GenContext, node: RefNum) -> str:
     if node.key is not None:
         ctx.refs[node.key] = label
     return label
+
+
+def _cite(ctx: GenContext, node: Cite) -> str:
+    labels = ctx.cite_labels
+    if not labels:
+        return ""
+    k = ctx.rng.int_in_range(node.lo, min(node.hi, len(labels)))
+    chosen: list[str] = []
+    guard = 0
+    while len(chosen) < k and guard < 50:
+        candidate = ctx.rng.choice(labels)
+        if candidate not in chosen:
+            chosen.append(candidate)
+        guard += 1
+    chosen.sort(key=lambda s: (len(s), s))
+    return "[" + ", ".join(chosen) + "]"
 
 
 def _format_number(ctx: GenContext, counter: str, value: int) -> str:

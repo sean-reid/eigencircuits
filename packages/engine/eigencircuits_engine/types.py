@@ -9,6 +9,7 @@ generation.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from dataclasses import field as dfield
 
@@ -128,7 +129,15 @@ class RefNum:
     key: str | None = None
 
 
-GNode = Lit | NT | Seq | Choice | Opt | Rep | Pick | Bind | Ref | Xform | Eqn | Sym | RefNum
+@dataclass(frozen=True)
+class Cite:
+    """Emit a citation drawn from the generated bibliography labels."""
+
+    lo: int = 1
+    hi: int = 2
+
+
+GNode = Lit | NT | Seq | Choice | Opt | Rep | Pick | Bind | Ref | Xform | Eqn | Sym | RefNum | Cite
 
 Grammar = dict[str, GNode]
 
@@ -170,6 +179,8 @@ class GenContext:
     refs: dict[str, str]
     depth: int = 0
     recent: dict[str, list[str]] = dfield(default_factory=dict)
+    extra: dict[str, Sequence[str]] = dfield(default_factory=dict)  # global banks (names, ...)
+    cite_labels: list[str] = dfield(default_factory=list)  # bibliography labels for citations
 
     def push_scope(self, kind: str) -> None:
         self.scopes.append(Scope(kind))
@@ -242,6 +253,12 @@ Block = Para | EnvBlock | ProofBlock | EquationBlock
 
 
 @dataclass
+class Reference:
+    label: str
+    text: str
+
+
+@dataclass
 class SectionModel:
     number: str
     heading: str
@@ -261,7 +278,7 @@ class PaperModel:
     msc_secondary: list[str]
     keywords: list[str]
     sections: list[SectionModel]
-    references: list[str]
+    references: list[Reference]
     style: PaperStyle
     acknowledgments: str | None = None
     funding: str | None = None

@@ -29,6 +29,11 @@ venv/
 .wrangler/
 .dev.vars
 
+# Local build/preview artifacts
+*.pdf
+*.aux
+*.out
+
 # Editor / OS
 .DS_Store
 .idea/
