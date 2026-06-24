@@ -1,0 +1,9 @@
+name = "eigencircuits"
+main = "src/entry.py"
+compatibility_date = "2025-06-01"
+compatibility_flags = ["python_workers"]
+
+# The pure-Python engine is vendored next to the worker before deploy:
+#   rm -rf src/eigencircuits_engine
+#   cp -R ../../packages/engine/eigencircuits_engine src/eigencircuits_engine
+# (wired up as a predeploy step in package.json).
