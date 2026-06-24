@@ -235,7 +235,7 @@ def _core_section(ctx: GenContext, heading: str) -> SectionModel:
     if ctx.rng.chance(0.55):
         equation = _display_equation(ctx)
         if equation is not None:
-            blocks.append(Para(ctx.rng.choice(_EQN_LEADS)))
+            blocks.append(Para(_fresh(ctx, "__lead__", _EQN_LEADS)))
             blocks.append(equation)
     if ctx.rng.chance(0.4):
         blocks.append(_env(ctx, "Example", "ExampleStmt"))
@@ -474,6 +474,20 @@ def _acknowledgments(ctx: GenContext) -> str | None:
 def _title(ctx: GenContext) -> str:
     raw = finalize(expand(NT("Title"), ctx))
     return titlecase(raw) if ctx.style.caps == "title" else cap_first(raw)
+
+
+def _fresh(ctx: GenContext, key: str, pool: tuple[str, ...]) -> str:
+    """Pick an item not yet used in this paper under ``key``; reset if exhausted."""
+    used = ctx.recent.setdefault(key, [])
+    for _ in range(8):
+        choice = pool[ctx.rng.int_in_range(0, len(pool) - 1)]
+        if choice not in used:
+            used.append(choice)
+            return choice
+    used.clear()
+    choice = pool[ctx.rng.int_in_range(0, len(pool) - 1)]
+    used.append(choice)
+    return choice
 
 
 def _bound(ctx: GenContext, name: str, bank: str) -> str:
