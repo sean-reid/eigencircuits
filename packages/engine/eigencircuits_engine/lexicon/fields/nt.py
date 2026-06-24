@@ -251,10 +251,51 @@ NT = SubfieldLexicon(
         "X",
         "Y",
     ],
-    eqn_motif=lambda roles: (
+    inline_eqns=[
+        r"a_p \equiv p + 1 \pmod{\ell}",
+        r"\lvert a_p \rvert \le 2\sqrt{p}",
+        r"a_n = O\!\left(n^{2} \log n\right)",
+        r"a_n = O\!\left(\sqrt{n}\,\log n\right)",
+        r"\sum_{n \le x} a_n = O\!\left(x^{1/2+\varepsilon}\right)",
+        r"\dim_{\mathbb{Q}} H^{1}(XSYM) = 2",
+        r"\dim_{\mathbb{Q}} H^{2}(XSYM) = 1",
+        r"T_m T_n = \sum_{d \mid (m,n)} d^{k-1} T_{mn/d^2}",
+        r"XSYM \cong \mathrm{Ind}_{H}^{G} ASYM",
+        r"\operatorname{ord}_{s=1} L(XSYM,s) = \operatorname{rank} XSYM(\mathbb{Q})",
+        r"a_p = 2\sqrt{p}\,\cos\theta_p",
+        r"\operatorname{tr}\rho(\mathrm{Frob}_p) = a_p",
+        r"\lvert \tau(\chi) \rvert = \sqrt{p}",
+        r"L(1,\chi) \neq 0",
+        r"v_p(XSYM) \ge 1",
+        r"\lambda = \mu = 0",
+        r"\#\,\mathrm{Sel}_p(XSYM) < \infty",
+        r"[K : \mathbb{Q}] = r_1 + 2r_2",
+        r"\zeta_K(s) = \sum_{\mathfrak{a}} (N\mathfrak{a})^{-s}",
+        r"L(s,\mathrm{Sym}^2 XSYM) = \zeta(s)\,L(s,\mathrm{ad}\,XSYM)",
+        r"\psi(x) = \sum_{n \le x} \Lambda(n) = x + O\!\left(\sqrt{x}\,\log^2 x\right)",
+        r"h_K \asymp \sqrt{|d_K|}\,\log|d_K|",
+    ],
+    display_eqns=[
         r"L(s,\chi) = \sum_{n \ge 1} \frac{\chi(n)}{n^{s}} "
-        r"= \prod_{p} \bigl(1 - \chi(p) p^{-s}\bigr)^{-1}"
-    ),
+        r"= \prod_{p} \bigl(1 - \chi(p) p^{-s}\bigr)^{-1}",
+        r"\Lambda(s,\chi) = \varepsilon(\chi)\,\Lambda(1-s,\bar\chi), \qquad "
+        r"\Lambda(s,\chi) = \left(\frac{q}{\pi}\right)^{s/2}"
+        r"\Gamma\!\left(\frac{s}{2}\right) L(s,\chi)",
+        r"XSYM(\tau) = \sum_{n \ge 1} a_n q^{n}, \qquad q = e^{2\pi i \tau}",
+        r"XSYM\!\left(\frac{a\tau+b}{c\tau+d}\right) = (c\tau+d)^{k}\, XSYM(\tau)",
+        r"0 \to E(\mathbb{Q})/pE(\mathbb{Q}) \to \mathrm{Sel}_p(E) "
+        r"\to \mathrm{Sha}(E)[p] \to 0",
+        r"\theta(-1/\tau) = \sqrt{\tau/i}\,\theta(\tau)",
+        r"L(s, XSYM \times g) = \zeta(2s) \sum_{n \ge 1} \frac{a_n b_n}{n^{s}}",
+        r"\lim_{s \to 1} (s-1)\zeta_K(s) "
+        r"= \frac{2^{r_1}(2\pi)^{r_2} h_K R_K}{w_K \sqrt{|d_K|}}",
+        r"\lim_{s \to 1} \frac{L(E,s)}{(s-1)^{r}} "
+        r"= \frac{\Omega_E \, R_E \prod_p c_p \, \#\mathrm{Sha}(E)}"
+        r"{(\#E(\mathbb{Q})_{\mathrm{tors}})^{2}}",
+        r"\Gamma_{\mathbb{R}}(s) = \pi^{-s/2}\,\Gamma\!\left(\frac{s}{2}\right)",
+        r"L(s,XSYM) = \sum_{n \ge 1} \frac{a_n}{n^{s}}, \qquad \Re(s) > \tfrac{k+1}{2}",
+        r"\#\{\,p \le x : a_p = 0\,\} = O\!\left(\frac{x}{(\log x)^{2}}\right)",
+    ],
     msc=["11F11", "11G05", "11M06", "11R23", "11F33", "11G40", "11F80", "11R34"],
     adjacent=["math.AG", "math.RT"],
 )

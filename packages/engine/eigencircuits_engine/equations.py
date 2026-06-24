@@ -1,9 +1,9 @@
 """Equation sub-grammar.
 
-Builds short, balanced, KaTeX-safe formulas from the locked subfield's symbol
-bank. A subfield's signature ``eqn_motif`` is preferred about 40% of the time;
-otherwise a generic motif is specialized with the field's symbols. Field motifs
-return bare LaTeX (no ``$``); this module wraps for inline or display use.
+Draws authentic formulas from the locked subfield's inline/display pools, with
+per-paper anti-repetition so the same formula does not recur. Templates carry
+the sentinel tokens ``XSYM`` (main symbol) and ``ASYM`` (another symbol). A
+generic, parametrized motif set is the fallback for fields without pools.
 """
 
 from __future__ import annotations
@@ -24,13 +24,34 @@ GENERIC_MOTIFS: tuple[str, ...] = (
 
 
 def build_eqn(ctx: GenContext, motif: str, display: bool) -> str:
-    roles = ctx.symbols.assigned()
-    if motif in ("field", "fieldSignature"):
-        body = ctx.field.eqn_motif(roles).strip()
+    pool = ctx.field.display_eqns if display else ctx.field.inline_eqns
+    if pool:
+        body = _fill(ctx, _draw(ctx, list(pool), "__eqd__" if display else "__eqi__"))
     else:
-        body = _generic(ctx, motif, roles).strip()
+        body = _generic(ctx, motif, ctx.symbols.assigned())
     body = body.strip("$").strip()
     return f"$$ {body} $$" if display else f"${body}$"
+
+
+def _draw(ctx: GenContext, pool: list[str], key: str) -> str:
+    """Pick a template not used yet in this paper; reset the memory if exhausted."""
+    used = ctx.recent.setdefault(key, [])
+    for _ in range(10):
+        choice = pool[ctx.rng.int_in_range(0, len(pool) - 1)]
+        if choice not in used:
+            used.append(choice)
+            return choice
+    used.clear()
+    return pool[ctx.rng.int_in_range(0, len(pool) - 1)]
+
+
+def _fill(ctx: GenContext, template: str) -> str:
+    x = ctx.symbols.get("mainObject", ctx.rng)
+    body = template.replace("XSYM", x)
+    if "ASYM" in body:
+        syms = [s for s in ctx.field.symbols if s != x] or list(ctx.field.symbols) or ["Y"]
+        body = body.replace("ASYM", syms[ctx.rng.int_in_range(0, len(syms) - 1)])
+    return body
 
 
 def _obj(ctx: GenContext, roles: dict[str, str], default: str) -> str:

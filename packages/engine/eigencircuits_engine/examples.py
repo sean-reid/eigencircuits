@@ -58,10 +58,15 @@ EXAMPLE_FIELD = SubfieldLexicon(
         ],
     },
     symbols=["X", "Y", "Z", "M", "\\mathcal{F}", "\\mathcal{L}"],
-    eqn_motif=lambda roles: (
-        rf"\chi({roles.get('mainObject', 'X')}) = "
-        r"\sum_{i \ge 0} (-1)^i \dim H^i"
-    ),
+    inline_eqns=[
+        r"\dim H^{1}(XSYM) = 2",
+        r"XSYM \cong ASYM",
+        r"\deg XSYM = 3",
+    ],
+    display_eqns=[
+        r"\chi(XSYM) = \sum_{i \ge 0} (-1)^i \dim H^i(XSYM)",
+        r"0 \to ASYM \to XSYM \to \mathcal{Q} \to 0",
+    ],
 )
 
 EXAMPLE_STYLE = PaperStyle(

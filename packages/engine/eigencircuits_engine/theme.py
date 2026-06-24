@@ -65,9 +65,10 @@ def make_style(rng: Rng) -> PaperStyle:
 
 
 def person_name(rng: Rng) -> str:
+    # One surname per author. (Joining two surnames with an en-dash reads as a
+    # compound eponym, not a person.) Genuinely hyphenated surnames already
+    # exist in the bank, e.g. "Harish-Chandra".
     surname = rng.choice(SURNAMES)
-    if rng.chance(0.12):
-        surname = f"{surname}--{rng.choice(SURNAMES)}"
     given = rng.choice(INITIALS) if rng.chance(0.4) else rng.choice(FIRST_NAMES)
     return f"{given} {surname}"
 
