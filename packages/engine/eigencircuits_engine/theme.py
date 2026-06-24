@@ -19,6 +19,7 @@ from .lexicon.global_bank import (
     SURNAMES,
 )
 from .lexicon.schema import SubfieldLexicon
+from .postprocess import ARTICLE_BANKS, strip_leading_article
 from .rng import Rng
 from .types import Author, BoundValue, GenContext, PaperStyle
 
@@ -47,7 +48,8 @@ def init_theme(ctx: GenContext) -> None:
 
 
 def rng_choice(ctx: GenContext, bank: str) -> str:
-    return ctx.rng.choice(ctx.field.bank(bank))
+    choice = ctx.rng.choice(ctx.field.bank(bank))
+    return strip_leading_article(choice) if bank in ARTICLE_BANKS else choice
 
 
 def make_style(rng: Rng) -> PaperStyle:

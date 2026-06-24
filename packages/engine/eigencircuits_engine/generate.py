@@ -99,7 +99,7 @@ def generate(seed: str | int | None = None) -> PaperModel:
         sections.append(_final_section(ctx, headings[cursor]))
         cursor += 1
 
-    acknowledgments = _acknowledgments(ctx)
+    acknowledgments = _acknowledgments(ctx, len(authors))
     funding = make_funding(rng)
 
     return PaperModel(
@@ -449,21 +449,28 @@ def _ascii_letters(text: str) -> str:
     return "".join(c for c in normalized if c.isascii() and c.isalpha()) or "X"
 
 
-def _acknowledgments(ctx: GenContext) -> str | None:
+def _acknowledgments(ctx: GenContext, n_authors: int) -> str | None:
     if not ctx.rng.chance(0.7):
         return None
-    thanks = ctx.rng.pick_weighted(
-        [(1.0, "thank"), (1.0, "are grateful to"), (1.0, "gratefully acknowledge")]
+    single = n_authors == 1
+    subject = "The author" if single else "The authors"
+    verb = ctx.rng.pick_weighted(
+        [
+            (1.0, "thanks" if single else "thank"),
+            (1.0, "is grateful to" if single else "are grateful to"),
+            (1.0, "gratefully acknowledges" if single else "gratefully acknowledge"),
+        ]
     )
     extra = ctx.rng.pick_weighted(
         [
             (1.0, "helpful discussions"),
             (1.0, "useful comments"),
             (1.0, "their interest in this work"),
+            (1.0, "comments on an earlier draft"),
         ]
     )
     name = ctx.rng.choice(SURNAMES)
-    return f"The authors {thanks} {name} for {extra}."
+    return f"{subject} {verb} {name} for {extra}."
 
 
 # --------------------------------------------------------------------------- #

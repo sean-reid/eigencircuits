@@ -27,6 +27,9 @@ _IRREGULAR_PLURALS: dict[str, str] = {
     "annulus": "annuli",
     "genus": "genera",
     "series": "series",
+    "data": "data",
+    "datum": "data",
+    "calculus": "calculi",
     "basis": "bases",
     "hypothesis": "hypotheses",
     "analysis": "analyses",
@@ -63,6 +66,18 @@ def _pluralize_word(word: str) -> str:
     return word + "s"
 
 
+_LEADING_ARTICLE = re.compile(r"^(the|an|a)\s+", re.IGNORECASE)
+
+# Banks the grammar prefixes with its own article/"the"; their entries must not
+# carry a leading article of their own.
+ARTICLE_BANKS = frozenset({"objects", "props", "invariants", "spaces", "maps"})
+
+
+def strip_leading_article(text: str) -> str:
+    """Drop a leading 'the'/'a'/'an' so the grammar can supply its own."""
+    return _LEADING_ARTICLE.sub("", text, count=1)
+
+
 def with_article(text: str) -> str:
     """Prefix ``text`` with "a" or "an" by the sound of its first token."""
     stripped = text.lstrip()
@@ -71,10 +86,15 @@ def with_article(text: str) -> str:
     return f"{'an' if _starts_with_vowel_sound(stripped) else 'a'} {stripped}"
 
 
+# Greek-letter macros whose spoken name begins with a vowel sound.
+_VOWEL_SOUND_GREEK = frozenset(
+    {"alpha", "epsilon", "eta", "iota", "omicron", "omega", "upsilon", "ell"}
+)
+
+
 def _starts_with_vowel_sound(text: str) -> bool:
     if text[0] == "$":
-        letter = _first_math_letter(text)
-        return letter is not None and letter.upper() in _VOWEL_SOUND_LETTERS
+        return _math_starts_with_vowel_sound(text)
     first = text[0].lower()
     if first not in "aeiou":
         return False
@@ -82,9 +102,17 @@ def _starts_with_vowel_sound(text: str) -> bool:
     return not re.match(r"(uni|use|euler|eu)", text.lower())
 
 
-def _first_math_letter(text: str) -> str | None:
-    match = re.search(r"[A-Za-z]", text)
-    return match.group(0) if match else None
+def _math_starts_with_vowel_sound(text: str) -> bool:
+    """Decide a/an for an inline symbol, reading the real symbol, not the macro
+    name (``\\mathcal{C}`` is "C", ``\\rho`` is read as 'rho')."""
+    inner = re.search(r"\\[a-zA-Z]+\*?\{([^}]*)\}", text)  # \mathcal{C}, \mathbb{Z}, ...
+    if inner and (m := re.search(r"[A-Za-z]", inner.group(1))):
+        return m.group(0).upper() in _VOWEL_SOUND_LETTERS
+    greek = re.match(r"\$\s*\\([a-zA-Z]+)", text)  # bare greek/named macro
+    if greek:
+        return greek.group(1).lower() in _VOWEL_SOUND_GREEK
+    letter = re.search(r"[A-Za-z]", text)
+    return letter is not None and letter.group(0).upper() in _VOWEL_SOUND_LETTERS
 
 
 def cap_first(text: str) -> str:

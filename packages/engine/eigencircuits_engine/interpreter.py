@@ -9,7 +9,16 @@ from __future__ import annotations
 
 from .equations import build_eqn
 from .lexicon.schema import SubfieldLexicon
-from .postprocess import cap_first, finalize, lower_first, pluralize, titlecase, with_article
+from .postprocess import (
+    ARTICLE_BANKS,
+    cap_first,
+    finalize,
+    lower_first,
+    pluralize,
+    strip_leading_article,
+    titlecase,
+    with_article,
+)
 from .rng import Rng, parse_seed
 from .symbols import SymbolAllocator
 from .types import (
@@ -163,6 +172,8 @@ def _pick_bank(ctx: GenContext, bank: str) -> str:
     recent.append(selected)
     if len(recent) > RECENT_MEMORY:
         recent.pop(0)
+    if bank in ARTICLE_BANKS:
+        return strip_leading_article(selected)
     return selected
 
 
