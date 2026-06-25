@@ -80,7 +80,7 @@ export function PdfPage() {
   return (
     <div className="pdfview">
       <div className="pdfbar">
-        <Link to={`/abs/${id}`}>← Back to abstract (arXiv:{id})</Link>
+        <Link to={`/abs/${id}`}>← Back to abstract (eiGen:{id})</Link>
         <span className="pdfbar-actions">
           {phase.kind === 'ready' && (
             <button className="linklike" onClick={() => downloadPdf(id, phase.pdf)}>
@@ -123,7 +123,7 @@ export function PdfPage() {
       )}
 
       {phase.kind === 'ready' && (
-        <iframe className="pdf-frame" src={phase.url} title={`arXiv:${id} (PDF)`} />
+        <iframe className="pdf-frame" src={phase.url} title={`eiGen:${id} (PDF)`} />
       )}
     </div>
   );

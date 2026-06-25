@@ -60,7 +60,6 @@ export interface AbsResponse {
   id: string;
   date: string;
   comments: string;
-  doi: string;
   submitter: string;
   submission: SubmissionVersion[];
   msc_primary: string;

@@ -15,7 +15,7 @@ export function Layout() {
     e.preventDefault();
     const value = query.trim();
     if (!value) return;
-    const id = value.replace(/^arxiv:/i, '');
+    const id = value.replace(/^(eigen|arxiv):/i, '');
     if (/^\d{4}\.\d{4,5}(v\d+)?$/.test(id)) navigate(`/abs/${id}`);
     else navigate(`/search?q=${encodeURIComponent(value)}`);
   };
@@ -30,7 +30,7 @@ export function Layout() {
           <input
             type="search"
             className="search-input"
-            placeholder="Search title, author, abstract, or arXiv ID"
+            placeholder="Search title, author, abstract, or eiGen ID"
             aria-label="Search papers"
             value={query}
             onChange={(e) => setQuery(e.target.value)}

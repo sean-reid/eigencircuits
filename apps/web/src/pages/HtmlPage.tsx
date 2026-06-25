@@ -20,7 +20,7 @@ export function HtmlPage() {
   return (
     <div className="htmlview">
       <div className="htmlbar">
-        <Link to={`/abs/${data.id}`}>← Back to abstract (arXiv:{data.id})</Link>
+        <Link to={`/abs/${data.id}`}>← Back to abstract (eiGen:{data.id})</Link>
         <button className="linklike" onClick={() => downloadTex(data.id, data.tex)}>
           Download .tex
         </button>

@@ -13,7 +13,7 @@ test('subject listing paginates recent submissions', async ({ page }) => {
   await page.goto('/list/math.NT/recent');
   await expect(page.getByRole('heading', { name: 'Number Theory' })).toBeVisible();
   await expect(page.getByText(/Total of \d+ entries/)).toBeVisible();
-  await expect(page.locator('text=/arXiv:\\d{4}\\.\\d{5}/').first()).toBeVisible();
+  await expect(page.locator('text=/eiGen:\\d{4}\\.\\d{5}/').first()).toBeVisible();
   await page.screenshot({ path: `${SHOTS}/02-listing.png`, fullPage: true });
 });
 

@@ -239,7 +239,6 @@ def abs_payload(today: dt.date, ident: str) -> dict[str, object] | None:
         "id": ident,
         "date": entry.date.isoformat(),
         "comments": _comments(ident),
-        "doi": f"10.48550/arXiv.{ident}",
         "submitter": model.authors[0].name,
         "submission": [{"version": 1, "datetime": stamp, "size_kb": len(tex) // 1024 + 1}],
         "msc_primary": model.msc_primary,

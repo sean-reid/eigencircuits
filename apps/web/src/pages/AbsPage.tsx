@@ -32,7 +32,7 @@ export function AbsPage() {
       <div className="abs-main">
         <div className="breadcrumb">
           <Link to="/archive/math">math</Link> &gt;{' '}
-          <Link to={`/list/${data.primary}/recent`}>{data.primary}</Link> &gt; arXiv:{data.id}
+          <Link to={`/list/${data.primary}/recent`}>{data.primary}</Link> &gt; eiGen:{data.id}
         </div>
         <h1 className="abs-title">
           <InlineText text={data.model.title} />
@@ -71,7 +71,7 @@ export function AbsPage() {
             <tr>
               <td className="label">Cite as:</td>
               <td>
-                arXiv:{data.id} [{data.primary}]
+                eiGen:{data.id} [{data.primary}]
               </td>
             </tr>
           </tbody>

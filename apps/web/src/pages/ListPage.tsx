@@ -33,7 +33,7 @@ export function EntryRow({ entry, n }: { entry: ListEntry; n: number }) {
       <div className="entry-id">
         <span className="entry-num">[{n}]</span>{' '}
         <Link to={`/abs/${entry.id}`} className="arxiv-id">
-          arXiv:{entry.id}
+          eiGen:{entry.id}
         </Link>{' '}
         <span className="formats">
           [<Link to={`/pdf/${entry.id}`}>pdf</Link>, <Link to={`/html/${entry.id}`}>html</Link>,{' '}
