@@ -87,7 +87,16 @@ async def on_fetch(request, env) -> Response:
         if payload:
             return _json(payload, cache=_IMMUTABLE)
         return _json({"error": "not found"}, status=404, cache=_NOSTORE)
-    # Static assets: the SPA, the vendored pdfTeX engine, and the TeX Live
-    # mirror under /texlive/. The assets binding applies _headers and resolves
-    # unknown paths to index.html (single-page-application not-found handling).
+    if route.path.startswith("/texlive/"):
+        # Serve a TeX file. A missing file would otherwise fall through to the
+        # SPA's index.html (single-page-application not-found handling), and the
+        # pdfTeX engine would ingest HTML as a .tex/.vf/.cfg file. Detect that
+        # fallback (text/html on a /texlive path) and report the file absent;
+        # the engine negative-caches a 301 and proceeds.
+        asset = await env.ASSETS.fetch(request)
+        content_type = asset.headers.get("content-type") or ""
+        if "text/html" in content_type:
+            return Response("Not found", status=301)
+        return asset
+    # Everything else is the SPA; unknown paths resolve to index.html.
     return await env.ASSETS.fetch(request)
