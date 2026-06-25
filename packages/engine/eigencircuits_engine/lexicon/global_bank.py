@@ -779,3 +779,23 @@ HEDGES: tuple[str, ...] = (
     "in general",
     "essentially",
 )
+
+# Predicates that apply to an invariant (a number or structure), as opposed to
+# the object-level adjectives in each field's `props` bank. Used wherever an
+# invariant is the subject of "is", so we never produce "the mu-invariant is CM".
+INVARIANT_PREDICATES: tuple[str, ...] = (
+    "finite",
+    "nonzero",
+    "trivial",
+    "bounded",
+    "well-defined",
+    "explicitly computable",
+    "stable under deformation",
+    "independent of the choices involved",
+    "invariant under base change",
+    "preserved under specialization",
+    "uniformly bounded",
+    "additive",
+    "computed in closed form",
+    "compatible with the natural filtration",
+)

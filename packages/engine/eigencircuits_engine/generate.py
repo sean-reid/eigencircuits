@@ -19,6 +19,7 @@ from .lexicon.fields.registry import BY_CODE
 from .lexicon.global_bank import (
     HEDGES,
     INITIALS,
+    INVARIANT_PREDICATES,
     JOURNALS,
     PROOF_CLOSERS,
     PROOF_CONNECTIVES,
@@ -177,6 +178,7 @@ def _make_context(rng: Rng, field: SubfieldLexicon, style: PaperStyle) -> GenCon
             "names": SURNAMES,
             "connectives": PROOF_CONNECTIVES,
             "hedges": HEDGES,
+            "invariantProps": INVARIANT_PREDICATES,
         },
     )
 

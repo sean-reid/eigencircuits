@@ -155,7 +155,7 @@ GRAMMAR: Grammar = {
                     lit(" of "),
                     _sym,
                     lit(" is "),
-                    pick("props"),
+                    pick("invariantProps"),
                     lit("."),
                 ),
             ),
@@ -351,7 +351,14 @@ GRAMMAR: Grammar = {
         [
             (
                 3,
-                seq(lit("the "), pick("invariants"), lit(" of "), _sym, lit(" is "), pick("props")),
+                seq(
+                    lit("the "),
+                    pick("invariants"),
+                    lit(" of "),
+                    _sym,
+                    lit(" is "),
+                    pick("invariantProps"),
+                ),
             ),
             (
                 2,
