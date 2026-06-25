@@ -1,13 +1,21 @@
 import katex from 'katex';
 import { Fragment, type ReactNode } from 'react';
 
+const _katexCache = new Map<string, string>();
+
 function katexHtml(tex: string, displayMode: boolean): string {
-  return katex.renderToString(tex, {
-    displayMode,
-    throwOnError: false,
-    output: 'htmlAndMathml',
-    strict: false,
-  });
+  const key = `${displayMode ? 'D' : 'I'}|${tex}`;
+  let html = _katexCache.get(key);
+  if (html === undefined) {
+    html = katex.renderToString(tex, {
+      displayMode,
+      throwOnError: false,
+      output: 'htmlAndMathml',
+      strict: false,
+    });
+    _katexCache.set(key, html);
+  }
+  return html;
 }
 
 type Token =

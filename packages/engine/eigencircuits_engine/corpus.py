@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import datetime as dt
 import functools
+import re
 import zlib
 from dataclasses import dataclass
 
@@ -95,20 +96,50 @@ def _crosslist(primary: str, ident: str) -> tuple[str, ...]:
     return tuple(chosen)
 
 
+def _make_entry(day: dt.date, seq: int) -> Entry:
+    ident = f"{day.year % 100:02d}{day.month:02d}.{seq:05d}"
+    primary = _weighted_subject(ident)
+    return Entry(ident, day, primary, _crosslist(primary, ident), _h(ident) & 0xFFFFFFFF)
+
+
 def build_manifest(today: dt.date, days: int = CORPUS_DAYS) -> list[Entry]:
     entries: list[Entry] = []
     day = today - dt.timedelta(days=days - 1)
+    # Carry a running within-month offset instead of recomputing it per day.
+    base = _month_offset(day)
     while day <= today:
-        base = _month_offset(day)
-        for k in range(_papers_on(day)):
-            seq = base + k + 1
-            ident = f"{day.year % 100:02d}{day.month:02d}.{seq:05d}"
-            primary = _weighted_subject(ident)
-            entries.append(
-                Entry(ident, day, primary, _crosslist(primary, ident), _h(ident) & 0xFFFFFFFF)
-            )
+        if day.day == 1:
+            base = 0
+        n = _papers_on(day)
+        for k in range(n):
+            entries.append(_make_entry(day, base + k + 1))
+        base += n
         day += dt.timedelta(days=1)
     return entries
+
+
+def _entry_from_id(today: dt.date, ident: str) -> Entry | None:
+    """Reconstruct a single entry directly from its id, without scanning the
+    whole manifest. Returns None if the id is malformed or falls outside the
+    current corpus window."""
+    m = re.fullmatch(r"(\d{2})(\d{2})\.(\d{5})", ident)
+    if not m:
+        return None
+    yy, mm, seq = int(m[1]), int(m[2]), int(m[3])
+    try:
+        cursor = dt.date(2000 + yy, mm, 1)
+    except ValueError:
+        return None
+    acc = 0
+    while cursor.month == mm:
+        n = _papers_on(cursor)
+        if acc < seq <= acc + n:
+            if not (today - dt.timedelta(days=CORPUS_DAYS - 1) <= cursor <= today):
+                return None
+            return _make_entry(cursor, seq)
+        acc += n
+        cursor += dt.timedelta(days=1)
+    return None
 
 
 def recent_dates(manifest: list[Entry], n: int = RECENT_DAYS) -> list[dt.date]:
@@ -139,17 +170,19 @@ def _subjects(entry: Entry) -> dict[str, object]:
 
 
 def listing_entry(entry: Entry, *, abstract: bool = False) -> dict[str, object]:
-    model = generate(entry.seed, entry.primary)
+    # A listing row needs only the front matter; generating the full paper
+    # (sections, proofs, equations) per row would be ~25x slower.
+    fm = front_matter(entry.seed, entry.primary)
     item: dict[str, object] = {
         "id": entry.id,
         "date": entry.date.isoformat(),
-        "title": model.title,
-        "authors": [a.name for a in model.authors],
+        "title": fm["title"],
+        "authors": fm["authors"],
         "comments": _comments(entry.id),
         **_subjects(entry),
     }
     if abstract:
-        item["abstract"] = model.abstract
+        item["abstract"] = fm["abstract"]
     return item
 
 
@@ -228,7 +261,7 @@ def search_payload(today: dt.date, query: str, cat: str, skip: int, show: int) -
 
 
 def abs_payload(today: dt.date, ident: str) -> dict[str, object] | None:
-    entry = next((e for e in build_manifest(today) if e.id == ident), None)
+    entry = _entry_from_id(today, ident)
     if entry is None:
         return None
     model = generate(entry.seed, entry.primary)

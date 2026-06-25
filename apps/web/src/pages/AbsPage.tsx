@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { fetchAbs } from '../api/client';
 import { useAsync } from '../api/useAsync';
@@ -9,11 +8,6 @@ import { downloadTex, formatDateTime } from '../util/format';
 export function AbsPage() {
   const { id = '' } = useParams();
   const { data, error, loading } = useAsync(() => fetchAbs(id), [id]);
-
-  // The PDF compiler lives one click away; warm it while the reader is here.
-  useEffect(() => {
-    prewarmPdfEngine();
-  }, []);
 
   if (loading) return <p className="status">Loading…</p>;
   if (error || !data) {
@@ -95,7 +89,13 @@ export function AbsPage() {
           <h2 className="side-head">Access Paper:</h2>
           <ul className="side-links">
             <li>
-              <Link to={`/pdf/${data.id}`}>View PDF</Link>
+              <Link
+                to={`/pdf/${data.id}`}
+                onMouseEnter={prewarmPdfEngine}
+                onFocus={prewarmPdfEngine}
+              >
+                View PDF
+              </Link>
             </li>
             <li>
               <Link to={`/html/${data.id}`}>Full text (HTML)</Link>

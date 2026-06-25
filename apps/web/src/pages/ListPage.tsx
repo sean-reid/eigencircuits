@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { memo } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { fetchAbs, fetchList } from '../api/client';
 import { useAsync } from '../api/useAsync';
@@ -25,7 +25,7 @@ function Subjects({ entry }: { entry: ListEntry }) {
   );
 }
 
-export function EntryRow({ entry, n }: { entry: ListEntry; n: number }) {
+export const EntryRow = memo(function EntryRow({ entry, n }: { entry: ListEntry; n: number }) {
   const onTex = () => {
     void fetchAbs(entry.id).then((r) => downloadTex(entry.id, r.tex));
   };
@@ -37,7 +37,11 @@ export function EntryRow({ entry, n }: { entry: ListEntry; n: number }) {
           eiGen:{entry.id}
         </Link>{' '}
         <span className="formats">
-          [<Link to={`/pdf/${entry.id}`}>pdf</Link>, <Link to={`/html/${entry.id}`}>html</Link>,{' '}
+          [
+          <Link to={`/pdf/${entry.id}`} onMouseEnter={prewarmPdfEngine} onFocus={prewarmPdfEngine}>
+            pdf
+          </Link>
+          , <Link to={`/html/${entry.id}`}>html</Link>,{' '}
           <button className="linklike" onClick={onTex}>
             tex
           </button>
@@ -60,7 +64,7 @@ export function EntryRow({ entry, n }: { entry: ListEntry; n: number }) {
       </div>
     </li>
   );
-}
+});
 
 export function ListPage() {
   const { cat = '', period = 'recent' } = useParams();
@@ -71,11 +75,6 @@ export function ListPage() {
     () => fetchList(cat, period, skip, show),
     [cat, period, skip, show],
   );
-
-  // Warm the PDF compiler; every listing row links straight to a PDF.
-  useEffect(() => {
-    prewarmPdfEngine();
-  }, []);
 
   if (loading) return <p className="status">Loading…</p>;
   if (error || !data) return <p className="status error">Could not load listing: {error}</p>;

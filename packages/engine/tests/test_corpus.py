@@ -35,6 +35,16 @@ def test_every_subject_name_resolves() -> None:
             assert cross["name"]
 
 
+def test_id_reconstruction_matches_manifest() -> None:
+    # abs_payload reconstructs an entry directly from its id; it must agree with
+    # the manifest for every id, and reject malformed or out-of-window ids.
+    manifest = corpus.build_manifest(TODAY)
+    for entry in manifest:
+        assert corpus._entry_from_id(TODAY, entry.id) == entry
+    assert corpus._entry_from_id(TODAY, "9999.99999") is None
+    assert corpus._entry_from_id(TODAY, "not-an-id") is None
+
+
 def test_search_returns_matches() -> None:
     payload = corpus.search_payload(TODAY, "the", "", 0, 25)
     total = payload["total"]
