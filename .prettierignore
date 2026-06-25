@@ -6,4 +6,6 @@ coverage
 research
 **/public
 apps/worker/texlive
+apps/worker/assets
+apps/worker/src/eigencircuits_engine
 **/*.py

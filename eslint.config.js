@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import reactHooks from 'eslint-plugin-react-hooks';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
@@ -9,6 +10,9 @@ export default tseslint.config(
       '**/coverage/**',
       '**/.wrangler/**',
       '**/public/**',
+      'apps/worker/assets/**',
+      'apps/worker/texlive/**',
+      'apps/worker/src/eigencircuits_engine/**',
       'research/**',
     ],
   },
@@ -25,6 +29,14 @@ export default tseslint.config(
     files: ['**/*.mjs'],
     languageOptions: {
       globals: { process: 'readonly', console: 'readonly', URL: 'readonly' },
+    },
+  },
+  {
+    files: ['**/*.{ts,tsx}'],
+    plugins: { 'react-hooks': reactHooks },
+    rules: {
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
     },
   },
 );

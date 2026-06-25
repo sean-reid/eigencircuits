@@ -27,6 +27,8 @@ export function useAsync<T>(fn: () => Promise<T>, deps: unknown[]): AsyncState<T
     return () => {
       alive = false;
     };
+    // Callers pass the real inputs as `deps`; `fn` is intentionally excluded.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
   return state;
