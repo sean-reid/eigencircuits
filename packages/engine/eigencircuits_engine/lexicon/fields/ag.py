@@ -80,7 +80,7 @@ AG = SubfieldLexicon(
             "rationally connected",
             "Fano",
             "Calabi--Yau",
-            "of general type",
+            "general-type",
             "minimal",
             "canonical",
             "terminal",
@@ -99,7 +99,7 @@ AG = SubfieldLexicon(
             "equivariant",
             "toric",
             "perfectoid",
-            "of finite type",
+            "finite-type",
         ],
         "spaces": [
             "moduli space",
