@@ -4,6 +4,7 @@ import { fetchAbs, fetchList } from '../api/client';
 import { useAsync } from '../api/useAsync';
 import { prewarmPdfEngine } from '../pdf/compile';
 import { InlineText } from '../render/tex';
+import { Pagination } from '../ui/Pagination';
 import type { ListEntry } from '../types/api';
 import { downloadTex, formatDate, formatMonth } from '../util/format';
 
@@ -93,15 +94,13 @@ export function ListPage() {
     else groups.push({ date: e.date, entries: [e] });
   }
 
-  const ranges: { from: number; to: number }[] = [];
-  for (let start = 0; start < data.total; start += show) {
-    ranges.push({ from: start, to: Math.min(start + show, data.total) });
-  }
-
   let counter = skip;
 
   return (
     <div className="listing">
+      <div className="breadcrumb">
+        <Link to="/archive/math">math</Link> &gt; {cat}
+      </div>
       <h1 className="page-title">{data.name}</h1>
       <h2 className="page-subtitle">
         {period === 'recent'
@@ -109,21 +108,7 @@ export function ListPage() {
           : `Authors and titles for ${formatMonth(period)}`}
       </h2>
 
-      <div className="pagination">
-        <span>Total of {data.total} entries</span>
-        {ranges.length > 0 && ' : '}
-        {ranges.map((r) =>
-          r.from === skip ? (
-            <span key={r.from} className="range current">
-              {r.from + 1}-{r.to}
-            </span>
-          ) : (
-            <button key={r.from} className="range linklike" onClick={() => setPage(r.from, show)}>
-              [{r.from + 1}-{r.to}]
-            </button>
-          ),
-        )}
-      </div>
+      <Pagination total={data.total} skip={skip} show={show} onPage={(s) => setPage(s, show)} />
       <div className="per-page">
         Showing up to {show} entries per page:{' '}
         {PER_PAGE.map((p, i) => (
@@ -147,11 +132,7 @@ export function ListPage() {
         counter += g.entries.length;
         return (
           <section key={g.date} className="day-group">
-            {period === 'recent' && (
-              <h3 className="day-head">
-                {formatDate(g.date)} (showing {g.entries.length} of {g.entries.length} entries)
-              </h3>
-            )}
+            {period === 'recent' && <h3 className="day-head">{formatDate(g.date)}</h3>}
             <ol className="entries" start={start + 1}>
               {g.entries.map((e, i) => (
                 <EntryRow key={e.id} entry={e} n={start + i + 1} />

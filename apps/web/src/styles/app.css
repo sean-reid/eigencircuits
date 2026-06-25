@@ -59,6 +59,16 @@ a:hover {
   text-decoration: underline;
 }
 
+/* Keyboard focus must stay visible on the custom-styled controls. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
 /* ------------------------------------------------------------------ chrome */
 .masthead {
   display: flex;
@@ -85,7 +95,6 @@ a:hover {
   margin-left: auto;
 }
 .search-input,
-.search-scope,
 .search-btn {
   font: inherit;
   font-size: 0.85rem;
@@ -118,8 +127,13 @@ a:hover {
   background: var(--bg);
   color: var(--ink);
   border-radius: 3px;
-  padding: 0.2rem 0.45rem;
+  padding: 0.2rem 0;
   cursor: pointer;
+  /* Fixed width so swapping the sun/moon glyph doesn't shift the masthead. */
+  display: inline-block;
+  width: 1.9rem;
+  text-align: center;
+  box-sizing: border-box;
 }
 
 .content {

@@ -45,10 +45,12 @@ export function AbsPage() {
 
         <table className="metatable">
           <tbody>
-            <tr>
-              <td className="label">Comments:</td>
-              <td>{data.comments}</td>
-            </tr>
+            {data.comments && (
+              <tr>
+                <td className="label">Comments:</td>
+                <td>{data.comments}</td>
+              </tr>
+            )}
             <tr>
               <td className="label">Subjects:</td>
               <td>

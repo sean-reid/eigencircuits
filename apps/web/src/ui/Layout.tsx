@@ -1,15 +1,22 @@
 import { useEffect, useState } from 'react';
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 export function Layout() {
   const [dark, setDark] = useState(() => localStorage.getItem('ec-dark') === '1');
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+  const [params] = useSearchParams();
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark);
     localStorage.setItem('ec-dark', dark ? '1' : '0');
   }, [dark]);
+
+  // Keep the search box showing the active query (blank away from /search).
+  useEffect(() => {
+    setQuery(location.pathname === '/search' ? (params.get('q') ?? '') : '');
+  }, [location.pathname, params]);
 
   const onSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +54,7 @@ export function Layout() {
             className="dark-toggle"
             onClick={() => setDark((d) => !d)}
             aria-label="Toggle dark mode"
+            aria-pressed={dark}
             title="Toggle dark mode"
           >
             {dark ? '☀' : '☾'}

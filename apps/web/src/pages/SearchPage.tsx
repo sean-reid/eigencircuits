@@ -1,6 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 import { fetchSearch } from '../api/client';
 import { useAsync } from '../api/useAsync';
+import { Pagination } from '../ui/Pagination';
 import { EntryRow } from './ListPage';
 
 export function SearchPage() {
@@ -27,11 +28,6 @@ export function SearchPage() {
     setParams(next);
   };
 
-  const ranges: { from: number; to: number }[] = [];
-  for (let start = 0; start < data.total; start += show) {
-    ranges.push({ from: start, to: Math.min(start + show, data.total) });
-  }
-
   return (
     <div className="listing">
       <h1 className="page-title">Search</h1>
@@ -39,23 +35,7 @@ export function SearchPage() {
         {data.total} result{data.total === 1 ? '' : 's'} for &ldquo;{query}&rdquo;
       </h2>
 
-      {data.total > show && (
-        <div className="pagination">
-          <span>Total of {data.total} entries</span>
-          {' : '}
-          {ranges.map((r) =>
-            r.from === skip ? (
-              <span key={r.from} className="range current">
-                {r.from + 1}-{r.to}
-              </span>
-            ) : (
-              <button key={r.from} className="range linklike" onClick={() => setPage(r.from)}>
-                [{r.from + 1}-{r.to}]
-              </button>
-            ),
-          )}
-        </div>
-      )}
+      <Pagination total={data.total} skip={skip} show={show} onPage={setPage} />
 
       {data.entries.length === 0 ? (
         <p className="status">No papers matched.</p>
