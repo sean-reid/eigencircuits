@@ -190,9 +190,11 @@ GRAMMAR: Grammar = {
                 ),
             ),
             (
-                2,
+                1,
                 seq(lit("this settles a question of "), pick("names"), lit(" in the affirmative.")),
             ),
+            (1, seq(lit("this answers a question raised by "), pick("names"), lit("."))),
+            (1, seq(lit("this confirms a prediction of "), pick("names"), lit("."))),
             (1, seq(lit("in particular, "), _sym, lit(" is "), pick("props"), lit("."))),
         ]
     ),

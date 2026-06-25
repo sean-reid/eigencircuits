@@ -216,15 +216,13 @@ _AFF_CITIES = (
 )
 _AFF_TEMPLATES = (
     "University of {city}",
-    "{city} Center for Mathematical Sciences",
     "Department of Mathematics, University of {city}",
     "Mathematical Institute, {city}",
+    "Institute of Mathematics, {city}",
     "Centre for Geometry and Number Theory, {city}",
-    "{city} Research Institute for Mathematical Sciences",
-    "Faculty of Mathematics, {city} State University",
     "School of Mathematics and Statistics, University of {city}",
+    "Faculty of Mathematics, University of {city}",
     "Technical University of {city}",
-    "National Institute of Mathematics, {city}",
 )
 
 
