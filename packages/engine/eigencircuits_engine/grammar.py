@@ -129,7 +129,7 @@ GRAMMAR: Grammar = {
                 3,
                 seq(
                     lit("Our approach combines "),
-                    ref("method"),
+                    pick("methods"),
                     lit(" with "),
                     pick("methods"),
                     lit("."),
@@ -382,7 +382,7 @@ GRAMMAR: Grammar = {
                 ),
             ),
             (2, seq(lit("the "), pick("invariants"), lit(" of "), _sym, lit(" is finite"))),
-            (2, seq(_sym, lit(" is determined by its "), pick("invariants"))),
+            (1, seq(_sym, lit(" is determined by its "), pick("invariants"))),
             (2, seq(_sym, lit(" admits "), article(seq(pick("props"), lit(" "), pick("objects"))))),
             (
                 2,
@@ -398,14 +398,11 @@ GRAMMAR: Grammar = {
                 ),
             ),
             (
-                2,
+                1,
                 seq(
-                    lit("every "),
-                    pick("props"),
-                    lit(" "),
-                    pick("objects"),
-                    lit(" arises from "),
                     _sym,
+                    lit(" arises from "),
+                    article(seq(pick("props"), lit(" "), pick("objects"))),
                 ),
             ),
             (1, seq(_sym, lit(" is "), pick("props"))),
