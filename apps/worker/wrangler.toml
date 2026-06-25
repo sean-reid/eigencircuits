@@ -2,6 +2,15 @@ name = "eigencircuits"
 main = "src/entry.py"
 compatibility_date = "2025-06-01"
 compatibility_flags = ["python_workers"]
+workers_dev = true
+
+# Custom domain: also serve at eigencircuits.dwainosaur.com (app at root, same
+# as the workers.dev subdomain). The dwainosaur.com zone is on Cloudflare, so
+# wrangler creates the proxied DNS record automatically. Unlike *.workers.dev,
+# this is reachable from mainland China.
+[[routes]]
+pattern = "eigencircuits.dwainosaur.com"
+custom_domain = true
 
 # Static assets: the built SPA, the vendored pdfTeX engine, and the self-hosted
 # TeX Live mirror under /texlive/. `assets/` is assembled by `pnpm vendor`
