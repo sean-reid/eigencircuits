@@ -242,11 +242,12 @@ def make_msc(rng: Rng, field: SubfieldLexicon) -> tuple[str, list[str]]:
 
 
 def make_keywords(rng: Rng, field: SubfieldLexicon) -> list[str]:
-    # Keywords are noun terms (objects, invariants, qualifiers); not methods, and
-    # math is kept intact ("$p$-adic", "$L$-function") as in real papers.
+    # Keywords are noun terms (objects, invariants, ambient spaces, structure
+    # maps, qualifiers); not methods, and math is kept intact ("$p$-adic",
+    # "$L$-function") as in real papers.
     pool: list[str] = []
-    for bank in ("objects", "invariants", "props"):
-        pool.extend(field.bank(bank))
+    for bank in ("objects", "invariants", "spaces", "maps", "props"):
+        pool.extend(strip_leading_article(term) for term in field.bank(bank))
     count = rng.int_in_range(4, 6)
     return _sample(rng, pool, min(count, len(pool)))
 
