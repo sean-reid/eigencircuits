@@ -91,7 +91,7 @@ export function Paper({ model }: { model: PaperModel }) {
       {model.sections.map((s) => (
         <section className="section" key={s.number}>
           <h2 className="section-head">
-            {s.number}. {s.heading}
+            {s.number}. <InlineText text={s.heading} />
           </h2>
           {s.blocks.map((b, i) => (
             <BlockView block={b} key={i} />

@@ -40,6 +40,8 @@ _IRREGULAR_PLURALS: dict[str, str] = {
     "sheaf": "sheaves",
     "leaf": "leaves",
     "curve": "curves",
+    "axis": "axes",
+    "torus": "tori",
 }
 
 
@@ -55,12 +57,16 @@ def pluralize(text: str) -> str:
 
 
 def _pluralize_word(word: str) -> str:
+    if "$" in word:  # a math token; appending "s" would corrupt the markup
+        return word
     lower = word.lower()
     if lower in _IRREGULAR_PLURALS:
         result = _IRREGULAR_PLURALS[lower]
         return result.capitalize() if word[:1].isupper() else result
-    if re.search(r"(s|x|z|ch|sh)$", lower):
+    if lower.endswith("ss") or re.search(r"(x|z|ch|sh)$", lower):
         return word + "es"
+    if lower.endswith("s"):
+        return word  # already plural (true singular-s nouns are handled above)
     if re.search(r"[^aeiou]y$", lower):
         return word[:-1] + "ies"
     return word + "s"

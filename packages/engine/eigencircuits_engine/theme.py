@@ -80,10 +80,17 @@ def make_authors(rng: Rng) -> tuple[list[Author], list[str]]:
     affiliations = [_affiliation(rng) for _ in range(n_aff)]
     # Email domain follows the affiliation, so address and email agree.
     domains = [_domain_for(a) for a in affiliations]
+    # Every affiliation must be claimed by at least one author (no orphaned
+    # superscript); cover each once, fill the rest at random, then shuffle so
+    # the covered ones aren't always the first authors.
+    aff_idx = list(range(n_aff)) + [rng.int_in_range(0, n_aff - 1) for _ in range(count - n_aff)]
+    for i in range(len(aff_idx) - 1, 0, -1):
+        j = rng.int_in_range(0, i)
+        aff_idx[i], aff_idx[j] = aff_idx[j], aff_idx[i]
     authors: list[Author] = []
-    for _ in range(count):
+    for k in range(count):
         name = person_name(rng)
-        aff = rng.int_in_range(0, n_aff - 1)
+        aff = aff_idx[k]
         authors.append(Author(name=name, affiliation=aff, email=_email(name, domains[aff])))
     return authors, affiliations
 
