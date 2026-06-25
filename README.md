@@ -23,8 +23,6 @@ arXiv, and carries the document skeleton in the grammar itself. A given seed
 always reproduces the same paper, which makes results shareable and tests
 deterministic.
 
-See [PLAN.md](PLAN.md) for the full design.
-
 ## Layout
 
 ```
