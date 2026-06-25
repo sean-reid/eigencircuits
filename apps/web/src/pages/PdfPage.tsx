@@ -1,21 +1,19 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { fetchAbs } from '../api/client';
 import { compilePdf } from '../pdf/compile';
 import type { AbsResponse } from '../types/api';
-import { downloadPdf, downloadTex } from '../util/format';
+import { downloadTex } from '../util/format';
 
 type Phase =
   | { kind: 'loading' }
   | { kind: 'compiling' }
-  | { kind: 'ready'; url: string; pdf: Uint8Array }
   | { kind: 'failed'; reason: string; log?: string };
 
 export function PdfPage() {
   const { id = '' } = useParams();
   const [abs, setAbs] = useState<AbsResponse | null>(null);
   const [phase, setPhase] = useState<Phase>({ kind: 'loading' });
-  const urlRef = useRef<string | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -41,8 +39,11 @@ export function PdfPage() {
           const url = URL.createObjectURL(
             new Blob([result.pdf as BlobPart], { type: 'application/pdf' }),
           );
-          urlRef.current = url;
-          setPhase({ kind: 'ready', url, pdf: result.pdf });
+          // Hand the compiled PDF to the browser's native viewer, like arXiv.
+          // Same-tab navigation avoids popup blocking and renders full-screen
+          // (fitting correctly on mobile); replace() keeps Back -> abstract.
+          // The object URL is intentionally not revoked so the viewer keeps it.
+          window.location.replace(url);
         } else {
           setPhase({
             kind: 'failed',
@@ -62,10 +63,6 @@ export function PdfPage() {
 
     return () => {
       alive = false;
-      if (urlRef.current) {
-        URL.revokeObjectURL(urlRef.current);
-        urlRef.current = null;
-      }
     };
   }, [id]);
 
@@ -81,18 +78,11 @@ export function PdfPage() {
     <div className="pdfview">
       <div className="pdfbar">
         <Link to={`/abs/${id}`}>← Back to abstract (eiGen:{id})</Link>
-        <span className="pdfbar-actions">
-          {phase.kind === 'ready' && (
-            <button className="linklike" onClick={() => downloadPdf(id, phase.pdf)}>
-              Download .pdf
-            </button>
-          )}
-          {abs && (
-            <button className="linklike" onClick={() => downloadTex(id, abs.tex)}>
-              Download .tex
-            </button>
-          )}
-        </span>
+        {abs && (
+          <button className="linklike" onClick={() => downloadTex(id, abs.tex)}>
+            Download .tex
+          </button>
+        )}
       </div>
 
       {phase.kind === 'loading' && <p className="status">Loading…</p>}
@@ -102,8 +92,9 @@ export function PdfPage() {
           <div className="spinner" aria-hidden="true" />
           <p className="status">Compiling with pdfTeX…</p>
           <p className="muted">
-            The first paper you open downloads the TeX engine and fetches the packages it needs, so
-            it can take a few seconds. Later papers compile much faster.
+            The PDF will open in your browser&rsquo;s viewer when it is ready. The first paper you
+            open downloads the TeX engine and its packages, so it can take a few seconds; later
+            papers compile much faster.
           </p>
         </div>
       )}
@@ -120,12 +111,6 @@ export function PdfPage() {
           </p>
           {phase.log && <pre className="pdf-log">{phase.log}</pre>}
         </div>
-      )}
-
-      {phase.kind === 'ready' && (
-        // #view=FitH asks the viewer to fit the page width to the frame, so the
-        // page isn't clipped on narrow (mobile) screens.
-        <iframe className="pdf-frame" src={`${phase.url}#view=FitH`} title={`eiGen:${id} (PDF)`} />
       )}
     </div>
   );

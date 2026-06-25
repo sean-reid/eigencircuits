@@ -51,17 +51,30 @@ test('search box jumps to an article by id', async ({ page }) => {
   await expect(page.getByText('Abstract:')).toBeVisible();
 });
 
-test('View PDF compiles a paper in the browser', async ({ page }) => {
+test('View PDF compiles the paper and hands off a PDF', async ({ page }) => {
   test.setTimeout(180_000); // first compile downloads the engine + packages
+  // Record when a PDF blob is created (the handoff to the native viewer). This
+  // is deterministic, unlike the subsequent navigation, which headless Chromium
+  // turns into a download rather than a URL change.
+  await page.addInitScript(() => {
+    const w = window as unknown as { __pdfReady?: boolean };
+    w.__pdfReady = false;
+    const orig = URL.createObjectURL.bind(URL);
+    URL.createObjectURL = (obj: Blob | MediaSource) => {
+      if (obj instanceof Blob && obj.type === 'application/pdf') w.__pdfReady = true;
+      return orig(obj);
+    };
+  });
   await page.goto('/list/math.NT/recent');
   await page.locator('a[href^="/pdf/"]').first().click();
   await expect(page).toHaveURL(/\/pdf\//);
   await expect(page.getByText(/Compiling with pdfTeX/)).toBeVisible();
-  // The self-hosted TeX Live mirror is served by the dev API, so the compile
-  // completes with no external dependency.
-  await expect(page.locator('.pdf-frame')).toBeVisible({ timeout: 150_000 });
-  await expect(page.getByRole('button', { name: 'Download .pdf' })).toBeVisible();
-  await page.screenshot({ path: `${SHOTS}/07-pdf.png`, fullPage: true });
+  // The self-hosted TeX Live mirror means the compile needs no external service.
+  await expect
+    .poll(() => page.evaluate(() => (window as unknown as { __pdfReady?: boolean }).__pdfReady), {
+      timeout: 150_000,
+    })
+    .toBe(true);
 });
 
 test('mobile archive layout', async ({ page }) => {

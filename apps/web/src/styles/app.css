@@ -359,16 +359,6 @@ input:focus-visible,
   margin-bottom: 1rem;
   font-size: 0.9rem;
 }
-.pdfbar-actions {
-  display: flex;
-  gap: 1rem;
-}
-.pdf-frame {
-  width: 100%;
-  height: 82vh;
-  border: 1px solid var(--chrome-border);
-  background: #fff;
-}
 .pdf-progress,
 .pdf-failed {
   max-width: 38rem;
@@ -418,9 +408,6 @@ input:focus-visible,
 @media (max-width: 768px) {
   .abs {
     grid-template-columns: 1fr;
-  }
-  .pdf-frame {
-    height: 70vh;
   }
   /* Stack the view bars so the back-link and download actions don't crowd. */
   .pdfbar,

@@ -44,10 +44,6 @@ export function downloadTex(id: string, tex: string): void {
   download(`eiGen-${id}.tex`, new Blob([tex], { type: 'text/x-tex' }));
 }
 
-export function downloadPdf(id: string, pdf: Uint8Array): void {
-  download(`eiGen-${id}.pdf`, new Blob([pdf as BlobPart], { type: 'application/pdf' }));
-}
-
 function download(name: string, blob: Blob): void {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
