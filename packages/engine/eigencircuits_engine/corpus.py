@@ -39,8 +39,21 @@ class Entry:
     seed: int
 
 
+# Real arXiv categories outside the math archive that math papers cross-list to.
+_EXTERNAL_NAMES = {
+    "cs.DM": "Discrete Mathematics",
+    "cs.IT": "Information Theory",
+    "cs.NA": "Numerical Analysis",
+    "math-ph": "Mathematical Physics",
+    "stat.ML": "Machine Learning",
+}
+
+
 def _name(code: str) -> str:
-    return BY_CODE[code].name
+    field = BY_CODE.get(code)
+    if field is not None:
+        return field.name
+    return _EXTERNAL_NAMES.get(code, code)
 
 
 def _papers_on(day: dt.date) -> int:

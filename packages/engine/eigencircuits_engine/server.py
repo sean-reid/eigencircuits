@@ -39,6 +39,13 @@ def _payload(seed: str | None) -> dict[str, object]:
     return {"model": to_dict(model), "tex": to_latex(model)}
 
 
+def _int(params: dict[str, list[str]], key: str, default: int) -> int:
+    try:
+        return int(params.get(key, [str(default)])[0])
+    except (TypeError, ValueError):
+        return default
+
+
 def _today() -> dt.date:
     return dt.datetime.now(dt.UTC).date()
 
@@ -94,15 +101,15 @@ class _Handler(BaseHTTPRequestHandler):
         if route.path == "/list":
             cat = params.get("cat", ["math.NT"])[0]
             period = params.get("period", ["recent"])[0]
-            skip = max(0, int(params.get("skip", ["0"])[0] or 0))
-            show = min(2000, max(1, int(params.get("show", ["50"])[0] or 50)))
+            skip = max(0, _int(params, "skip", 0))
+            show = min(2000, max(1, _int(params, "show", 50)))
             self._send(200, _corpus.list_payload(_today(), cat, period, skip, show))
             return
         if route.path == "/search":
             query = params.get("q", [""])[0]
             cat = params.get("cat", [""])[0]
-            skip = max(0, int(params.get("skip", ["0"])[0] or 0))
-            show = min(500, max(1, int(params.get("show", ["50"])[0] or 50)))
+            skip = max(0, _int(params, "skip", 0))
+            show = min(500, max(1, _int(params, "show", 50)))
             self._send(200, _corpus.search_payload(_today(), query, cat, skip, show))
             return
         if route.path == "/abs":
