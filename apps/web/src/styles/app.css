@@ -431,11 +431,26 @@ input:focus-visible,
   .subject-list {
     columns: 1;
   }
+  /* Compact two-row masthead: wordmark + About/toggle on one line, the search
+     bar full-width below. */
+  .masthead {
+    gap: 0.5rem 0.75rem;
+    padding: 0.55rem 1rem;
+  }
+  .wordmark {
+    font-size: 1.4rem;
+  }
+  .masthead-links {
+    order: 2;
+    margin-left: auto;
+  }
   .search {
-    margin-left: 0;
+    order: 3;
     width: 100%;
+    margin: 0;
   }
   .search-input {
     flex: 1;
+    min-width: 0;
   }
 }
