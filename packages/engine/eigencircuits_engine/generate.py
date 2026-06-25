@@ -15,6 +15,7 @@ from typing import Any
 from . import GRAMMAR_VERSION
 from .grammar import GRAMMAR
 from .interpreter import expand
+from .lexicon.fields.registry import BY_CODE
 from .lexicon.global_bank import (
     HEDGES,
     INITIALS,
@@ -54,10 +55,10 @@ from .types import (
 )
 
 
-def generate(seed: str | int | None = None) -> PaperModel:
+def generate(seed: str | int | None = None, subfield: str | None = None) -> PaperModel:
     seed_int = parse_seed(seed) if seed is not None else secrets.randbits(32)
     rng = Rng(seed_int)
-    field = select_field(rng)
+    field = BY_CODE[subfield] if subfield is not None else select_field(rng)
     style = make_style(rng)
     ctx = _make_context(rng, field, style)
     init_theme(ctx)

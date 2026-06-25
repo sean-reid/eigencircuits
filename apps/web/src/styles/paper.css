@@ -1,0 +1,147 @@
+/* The generated paper, typeset like a LaTeX amsart article on white paper. */
+.paper {
+  max-width: 720px;
+  margin: 0 auto;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Latin Modern Roman', 'Computer Modern', Georgia, 'Times New Roman', serif;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  text-align: justify;
+  hyphens: auto;
+}
+
+.paper .title {
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0 0 1rem;
+  hyphens: none;
+}
+
+.authors {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.author-line {
+  font-variant: small-caps;
+  font-size: 1.05rem;
+  letter-spacing: 0.3px;
+}
+
+.authors .affiliations {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.author-line sup {
+  font-variant: normal;
+  font-size: 0.7em;
+}
+
+.abstract {
+  font-size: 0.95rem;
+  margin: 0 1.5rem 1.25rem;
+  line-height: 1.5;
+}
+
+.abstract-head {
+  font-variant: small-caps;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.msc,
+.keywords {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: 0.15rem 1.5rem;
+  text-align: left;
+}
+
+.msc .label,
+.keywords .label {
+  font-style: italic;
+}
+
+.section-head {
+  text-align: center;
+  font-variant: small-caps;
+  font-weight: 600;
+  font-size: 1.05rem;
+  letter-spacing: 0.4px;
+  margin: 1.9rem 0 0.8rem;
+}
+
+.subsection-head {
+  font-variant: small-caps;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.para,
+.env,
+.proof {
+  margin: 0 0 0.75rem;
+  text-indent: 1.4em;
+}
+
+.statement.italic {
+  font-style: italic;
+}
+
+.proof .qed {
+  float: right;
+}
+
+.equation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin: 1rem 0;
+  text-indent: 0;
+}
+
+.equation .eqno {
+  position: absolute;
+  right: 0;
+  color: var(--ink);
+}
+
+.references {
+  margin-top: 2rem;
+}
+
+.reflist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.reflist li {
+  padding-left: 2.6em;
+  text-indent: -2.6em;
+  margin-bottom: 0.3rem;
+  line-height: 1.4;
+}
+
+.reflabel {
+  font-variant: normal;
+}
+
+/* KaTeX display blocks inside our fl/flex equation row shouldn't add margin. */
+.equation .katex-display {
+  margin: 0;
+}
+.math-inline {
+  white-space: nowrap;
+}

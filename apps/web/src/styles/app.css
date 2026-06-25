@@ -1,0 +1,153 @@
+/* Site chrome, in the spirit of arXiv.org: red wordmark, slim light header,
+   sans-serif controls, plenty of white space. */
+:root {
+  --arxiv-red: #b31b1b;
+  --link: #1a4b8c;
+  --bg: #ffffff;
+  --chrome-bg: #f5f5f5;
+  --chrome-border: #dcdcdc;
+  --ink: #1a1a1a;
+  --muted: #555;
+  --button-bg: #ffffff;
+  --button-border: #c8c8c8;
+}
+
+:root.dark {
+  --arxiv-red: #e06c6c;
+  --link: #8ab4f8;
+  --bg: #16181c;
+  --chrome-bg: #1f2228;
+  --chrome-border: #33373f;
+  --ink: #e7e7e7;
+  --muted: #a0a4ad;
+  --button-bg: #23262d;
+  --button-border: #3a3f49;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+/* Header / toolbar */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  padding: 0.6rem 1.25rem;
+  background: var(--chrome-bg);
+  border-bottom: 1px solid var(--chrome-border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.toolbar-left,
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 1.45rem;
+  letter-spacing: -0.5px;
+  color: var(--arxiv-red);
+  margin-right: 0.4rem;
+}
+
+.toolbar button {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.32rem 0.7rem;
+  border: 1px solid var(--button-border);
+  border-radius: 4px;
+  background: var(--button-bg);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.toolbar button:hover:not(:disabled) {
+  border-color: var(--arxiv-red);
+}
+
+.toolbar button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.toolbar button.primary {
+  background: var(--arxiv-red);
+  border-color: var(--arxiv-red);
+  color: #fff;
+  font-weight: 600;
+}
+
+.toolbar button.icon {
+  padding: 0.32rem 0.55rem;
+}
+
+.seed-input {
+  font: inherit;
+  font-size: 0.85rem;
+  width: 7.5rem;
+  padding: 0.32rem 0.5rem;
+  border: 1px solid var(--button-border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.stage {
+  padding: 2.5rem 1.25rem 5rem;
+}
+
+.loading,
+.error {
+  text-align: center;
+  color: var(--muted);
+  margin-top: 4rem;
+}
+
+.error {
+  color: var(--arxiv-red);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+@media (max-width: 640px) {
+  .brand {
+    font-size: 1.2rem;
+  }
+  .toolbar {
+    padding: 0.5rem 0.75rem;
+  }
+  .stage {
+    padding: 1.5rem 0.9rem 3rem;
+  }
+}

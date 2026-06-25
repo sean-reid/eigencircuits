@@ -12,11 +12,13 @@ Run with:  uv --project packages/engine run python -m eigencircuits_engine.serve
 
 from __future__ import annotations
 
+import datetime as dt
 import json
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
 from . import GRAMMAR_VERSION
+from . import corpus as _corpus
 from .generate import generate, to_dict
 from .latex import to_latex
 
@@ -24,6 +26,10 @@ from .latex import to_latex
 def _payload(seed: str | None) -> dict[str, object]:
     model = generate(seed)
     return {"model": to_dict(model), "tex": to_latex(model)}
+
+
+def _today() -> dt.date:
+    return dt.datetime.now(dt.UTC).date()
 
 
 class _Handler(BaseHTTPRequestHandler):
@@ -37,15 +43,31 @@ class _Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(data)
 
-    def do_GET(self) -> None:  # noqa: N802 (stdlib API name)
+    def do_GET(self) -> None:
         route = urlparse(self.path)
+        params = parse_qs(route.query)
         if route.path == "/health":
             self._send(200, {"ok": True, "grammarVersion": GRAMMAR_VERSION})
             return
         if route.path == "/generate":
-            params = parse_qs(route.query)
-            seed = params.get("seed", [None])[0]
-            self._send(200, _payload(seed))
+            self._send(200, _payload(params.get("seed", [None])[0]))
+            return
+        if route.path == "/archive":
+            self._send(200, _corpus.archive_payload(_today()))
+            return
+        if route.path == "/list":
+            cat = params.get("cat", ["math.NT"])[0]
+            period = params.get("period", ["recent"])[0]
+            skip = max(0, int(params.get("skip", ["0"])[0] or 0))
+            show = min(2000, max(1, int(params.get("show", ["50"])[0] or 50)))
+            self._send(200, _corpus.list_payload(_today(), cat, period, skip, show))
+            return
+        if route.path == "/abs":
+            payload = _corpus.abs_payload(_today(), params.get("id", [""])[0])
+            if payload is None:
+                self._send(404, {"error": "not found"})
+            else:
+                self._send(200, payload)
             return
         self._send(404, {"error": "not found"})
 
