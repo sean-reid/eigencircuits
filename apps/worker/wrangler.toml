@@ -3,7 +3,16 @@ main = "src/entry.py"
 compatibility_date = "2025-06-01"
 compatibility_flags = ["python_workers"]
 
+# Static assets: the built SPA, the vendored pdfTeX engine, and the self-hosted
+# TeX Live mirror under /texlive/. `assets/` is assembled by `pnpm vendor`
+# (see package.json) and is not checked in. Unknown paths fall back to
+# index.html so client-side routes resolve.
+[assets]
+directory = "assets"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
 # The pure-Python engine is vendored next to the worker before deploy:
 #   rm -rf src/eigencircuits_engine
 #   cp -R ../../packages/engine/eigencircuits_engine src/eigencircuits_engine
-# (wired up as a predeploy step in package.json).
+# (wired up as the `vendor` step in package.json).

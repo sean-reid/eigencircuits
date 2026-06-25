@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import pathlib
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
@@ -21,6 +22,16 @@ from . import GRAMMAR_VERSION
 from . import corpus as _corpus
 from .generate import generate, to_dict
 from .latex import to_latex
+
+# Self-hosted TeX Live mirror for the in-browser pdfTeX engine. Served here in
+# dev exactly as Cloudflare static assets serve it in production: each file is
+# returned with a `fileid` header (its real basename), which the worker uses to
+# name the file in its virtual filesystem.
+_TEXLIVE_DIR = pathlib.Path(__file__).resolve().parents[3] / "apps" / "worker" / "texlive"
+_MANIFEST_PATH = _TEXLIVE_DIR / "manifest.json"
+_MANIFEST: dict[str, str] = (
+    json.loads(_MANIFEST_PATH.read_text()) if _MANIFEST_PATH.is_file() else {}
+)
 
 
 def _payload(seed: str | None) -> dict[str, object]:
@@ -43,9 +54,34 @@ class _Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(data)
 
+    def _serve_texlive(self, path: str) -> None:
+        rel = path[len("/texlive/") :].lstrip("/")
+        target = (_TEXLIVE_DIR / rel).resolve()
+        if not rel or _TEXLIVE_DIR not in target.parents or not target.is_file():
+            body = b"File not found"
+            self.send_response(301)
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+        data = target.read_bytes()
+        self.send_response(200)
+        self.send_header("Content-Type", "application/octet-stream")
+        self.send_header("Content-Length", str(len(data)))
+        self.send_header("fileid", _MANIFEST.get(rel, target.name))
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Expose-Headers", "fileid")
+        self.send_header("Cache-Control", "public, max-age=31536000, immutable")
+        self.end_headers()
+        self.wfile.write(data)
+
     def do_GET(self) -> None:
         route = urlparse(self.path)
         params = parse_qs(route.query)
+        if route.path.startswith("/texlive/"):
+            self._serve_texlive(route.path)
+            return
         if route.path == "/health":
             self._send(200, {"ok": True, "grammarVersion": GRAMMAR_VERSION})
             return

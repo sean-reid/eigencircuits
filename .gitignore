@@ -30,6 +30,9 @@ venv/
 # Cloudflare / Wrangler
 .wrangler/
 .dev.vars
+# Worker build output: engine is vendored, assets assembled, by `pnpm vendor`.
+apps/worker/src/eigencircuits_engine/
+apps/worker/assets/
 
 # Local build/preview artifacts
 *.pdf

@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { fetchAbs, fetchList } from '../api/client';
 import { useAsync } from '../api/useAsync';
+import { prewarmPdfEngine } from '../pdf/compile';
 import { InlineText } from '../render/tex';
 import type { ListEntry } from '../types/api';
 import { downloadTex, formatDate, formatMonth } from '../util/format';
@@ -34,11 +36,11 @@ export function EntryRow({ entry, n }: { entry: ListEntry; n: number }) {
           arXiv:{entry.id}
         </Link>{' '}
         <span className="formats">
-          [<Link to={`/html/${entry.id}`}>pdf</Link>,{' '}
+          [<Link to={`/pdf/${entry.id}`}>pdf</Link>, <Link to={`/html/${entry.id}`}>html</Link>,{' '}
           <button className="linklike" onClick={onTex}>
             tex
           </button>
-          , <Link to={`/abs/${entry.id}`}>other</Link>]
+          ]
         </span>
       </div>
       <div className="entry-title">
@@ -68,6 +70,11 @@ export function ListPage() {
     () => fetchList(cat, period, skip, show),
     [cat, period, skip, show],
   );
+
+  // Warm the PDF compiler; every listing row links straight to a PDF.
+  useEffect(() => {
+    prewarmPdfEngine();
+  }, []);
 
   if (loading) return <p className="status">Loading…</p>;
   if (error || !data) return <p className="status error">Could not load listing: {error}</p>;

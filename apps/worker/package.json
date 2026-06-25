@@ -1,0 +1,11 @@
+{
+  "name": "@eigencircuits/worker",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "vendor": "pnpm --filter @eigencircuits/web build && node vendor.mjs",
+    "deploy": "pnpm run vendor && wrangler deploy",
+    "dev": "wrangler dev"
+  }
+}

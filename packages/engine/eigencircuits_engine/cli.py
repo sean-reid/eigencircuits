@@ -17,12 +17,15 @@ def main(argv: Sequence[str] | None = None) -> int:
         description="Generate an arXiv-style mathematics paper.",
     )
     parser.add_argument("--seed", default=None, help="base36 seed (default: random)")
+    parser.add_argument(
+        "--subfield", default=None, help="force a subject class, e.g. math.NT (default: weighted)"
+    )
     fmt = parser.add_mutually_exclusive_group()
     fmt.add_argument("--tex", action="store_true", help="emit LaTeX")
     fmt.add_argument("--json", action="store_true", help="emit JSON")
     args = parser.parse_args(argv)
 
-    model = generate(args.seed)
+    model = generate(args.seed, args.subfield)
     if args.tex:
         print(to_latex(model))
     elif args.json:

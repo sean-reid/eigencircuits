@@ -1,8 +1,13 @@
 """Cloudflare Python Worker exposing the eigencircuits generator.
 
-Routes (same contract as the local dev server):
-    GET /generate[?seed=<s>] -> { "model": <PaperModel>, "tex": <str> }
-    GET /health              -> { "ok": true, "grammarVersion": <int> }
+The worker is the single origin. It answers the JSON API and hands everything
+else to the static-asset binding:
+
+    GET /health|/generate|/archive|/list|/search|/abs -> JSON API
+    GET /texlive/...   -> self-hosted TeX Live mirror (static asset; the
+                          required `fileid` header is set by assets/_headers)
+    everything else    -> the built SPA, with client-side routes resolved by
+                          single-page-application not-found handling
 
 The ``eigencircuits_engine`` package is vendored next to this file at deploy
 time (see wrangler.toml); it is pure Python and runs under Pyodide.
@@ -41,7 +46,7 @@ def _json(body: dict, status: int = 200) -> Response:
     return Response(json.dumps(body, ensure_ascii=False), status=status, headers=_HEADERS)
 
 
-async def on_fetch(request) -> Response:
+async def on_fetch(request, env) -> Response:
     route = urlparse(request.url)
     params = parse_qs(route.query)
     if route.path == "/health":
@@ -71,4 +76,7 @@ async def on_fetch(request) -> Response:
     if route.path == "/abs":
         payload = corpus.abs_payload(_today(), params.get("id", [""])[0])
         return _json(payload, status=200) if payload else _json({"error": "not found"}, 404)
-    return _json({"error": "not found"}, status=404)
+    # Static assets: the SPA, the vendored pdfTeX engine, and the TeX Live
+    # mirror under /texlive/. The assets binding applies _headers and resolves
+    # unknown paths to index.html (single-page-application not-found handling).
+    return await env.ASSETS.fetch(request)

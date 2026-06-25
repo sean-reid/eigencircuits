@@ -4,4 +4,6 @@ build
 coverage
 .wrangler
 research
+**/public
+apps/worker/texlive
 **/*.py

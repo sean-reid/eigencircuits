@@ -5,6 +5,7 @@ import { ArchivePage } from './pages/ArchivePage';
 import { HtmlPage } from './pages/HtmlPage';
 import { ListPage } from './pages/ListPage';
 import { NotFound } from './pages/NotFound';
+import { PdfPage } from './pages/PdfPage';
 import { SearchPage } from './pages/SearchPage';
 import { Layout } from './ui/Layout';
 
@@ -20,6 +21,7 @@ export function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/abs/:id" element={<AbsPage />} />
           <Route path="/html/:id" element={<HtmlPage />} />
+          <Route path="/pdf/:id" element={<PdfPage />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

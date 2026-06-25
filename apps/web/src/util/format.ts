@@ -41,10 +41,17 @@ export function formatMonth(period: string): string {
 }
 
 export function downloadTex(id: string, tex: string): void {
-  const blob = new Blob([tex], { type: 'text/x-tex' });
+  download(`arXiv-${id}.tex`, new Blob([tex], { type: 'text/x-tex' }));
+}
+
+export function downloadPdf(id: string, pdf: Uint8Array): void {
+  download(`arXiv-${id}.pdf`, new Blob([pdf as BlobPart], { type: 'application/pdf' }));
+}
+
+function download(name: string, blob: Blob): void {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `arXiv-${id}.tex`;
+  a.download = name;
   a.click();
   URL.revokeObjectURL(a.href);
 }
