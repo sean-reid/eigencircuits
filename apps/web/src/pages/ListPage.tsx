@@ -6,7 +6,7 @@ import { prewarmPdfEngine } from '../pdf/compile';
 import { InlineText } from '../render/tex';
 import { Pagination } from '../ui/Pagination';
 import type { ListEntry } from '../types/api';
-import { downloadTex, formatDate, formatMonth } from '../util/format';
+import { downloadTex, formatMonth } from '../util/format';
 
 const PER_PAGE = [25, 50, 100, 250];
 
@@ -83,17 +83,19 @@ export function ListPage() {
     setParams({ skip: String(nextSkip), show: String(nextShow) });
   };
 
-  // Continuous [n] numbering over the page; group by day for the recent view.
-  const groups: { date: string; entries: ListEntry[] }[] = [];
-  for (const e of data.entries) {
-    const last = groups[groups.length - 1];
-    if (period === 'recent' && last && last.date === e.date) last.entries.push(e);
-    else if (period === 'recent') groups.push({ date: e.date, entries: [e] });
-    else if (last) last.entries.push(e);
-    else groups.push({ date: e.date, entries: [e] });
-  }
+  // arXiv lists papers whose primary subject is this category, then a separate
+  // "Cross-lists" section for papers primarily in another category. Numbering
+  // is continuous across both sections.
+  const primaries = data.entries.filter((e) => e.primary === cat);
+  const crosses = data.entries.filter((e) => e.primary !== cat);
 
-  let counter = skip;
+  const renderEntries = (entries: ListEntry[], startN: number) => (
+    <ol className="entries" start={startN}>
+      {entries.map((e, i) => (
+        <EntryRow key={e.id} entry={e} n={startN + i} />
+      ))}
+    </ol>
+  );
 
   return (
     <div className="listing">
@@ -126,20 +128,16 @@ export function ListPage() {
 
       {data.entries.length === 0 && <p className="status">No entries in this period.</p>}
 
-      {groups.map((g) => {
-        const start = counter;
-        counter += g.entries.length;
-        return (
-          <section key={g.date} className="day-group">
-            {period === 'recent' && <h3 className="day-head">{formatDate(g.date)}</h3>}
-            <ol className="entries" start={start + 1}>
-              {g.entries.map((e, i) => (
-                <EntryRow key={e.id} entry={e} n={start + i + 1} />
-              ))}
-            </ol>
-          </section>
-        );
-      })}
+      {primaries.length > 0 && renderEntries(primaries, skip + 1)}
+
+      {crosses.length > 0 && (
+        <section className="cross-lists">
+          <h3 className="day-head">
+            Cross-lists ({crosses.length} {crosses.length === 1 ? 'entry' : 'entries'})
+          </h3>
+          {renderEntries(crosses, skip + 1 + primaries.length)}
+        </section>
+      )}
     </div>
   );
 }
