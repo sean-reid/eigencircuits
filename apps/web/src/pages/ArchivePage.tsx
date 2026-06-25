@@ -10,14 +10,12 @@ export function ArchivePage() {
 
   return (
     <div className="archive">
-      <h1 className="page-title">
-        Mathematics <span className="since">(since February 1992)</span>
-      </h1>
+      <h1 className="page-title">Mathematics</h1>
       <p className="intro">
         For a specific paper, enter the identifier into the top right search box.
       </p>
       <p className="archive-total">
-        Total of {data.total.toLocaleString()} entries in the last 90 days.
+        Total of {data.total.toLocaleString()} entries in the most recent listings.
       </p>
       <ul className="subject-list">
         {data.subjects.map((s) => (
