@@ -109,15 +109,23 @@
 .equation {
   display: flex;
   align-items: center;
-  justify-content: center;
-  position: relative;
+  gap: 0.5rem;
   margin: 1rem 0;
   text-indent: 0;
 }
 
+/* The math sits in its own box that scrolls horizontally when an equation is
+   wider than the column (e.g. on mobile), so it never stretches the page. */
+.equation .math-scroll {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  text-align: center;
+}
+
 .equation .eqno {
-  position: absolute;
-  right: 0;
+  flex: 0 0 auto;
   color: var(--ink);
 }
 

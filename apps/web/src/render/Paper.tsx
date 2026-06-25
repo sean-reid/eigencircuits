@@ -60,7 +60,9 @@ function BlockView({ block }: { block: Block }) {
     case 'equation':
       return (
         <div className="equation">
-          <DisplayMath tex={block.tex} />
+          <span className="math-scroll">
+            <DisplayMath tex={block.tex} />
+          </span>
           {block.number && <span className="eqno">({block.number})</span>}
         </div>
       );

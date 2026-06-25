@@ -70,3 +70,16 @@ test('mobile archive layout', async ({ page }) => {
   await expect(page.getByRole('heading', { name: /Mathematics/ })).toBeVisible();
   await page.screenshot({ path: `${SHOTS}/05-mobile-archive.png`, fullPage: true });
 });
+
+test('mobile full-text view does not overflow horizontally', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/list/math.NT/recent');
+  await page.locator('a[href^="/html/"]').first().click();
+  await expect(page.locator('.paper .title')).toBeVisible();
+  // Wide display equations must scroll within their box, not stretch the page.
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  expect(overflow).toBeLessThanOrEqual(1);
+  await page.screenshot({ path: `${SHOTS}/08-mobile-html.png`, fullPage: true });
+});

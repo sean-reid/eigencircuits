@@ -339,6 +339,8 @@ input:focus-visible,
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
   border-bottom: 1px solid var(--chrome-border);
   padding-bottom: 0.6rem;
   margin-bottom: 1.5rem;
@@ -350,6 +352,8 @@ input:focus-visible,
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
   border-bottom: 1px solid var(--chrome-border);
   padding-bottom: 0.6rem;
   margin-bottom: 1rem;
@@ -417,6 +421,12 @@ input:focus-visible,
   }
   .pdf-frame {
     height: 70vh;
+  }
+  /* Stack the view bars so the back-link and download actions don't crowd. */
+  .pdfbar,
+  .htmlbar {
+    flex-direction: column;
+    align-items: flex-start;
   }
   .subject-list {
     columns: 1;
