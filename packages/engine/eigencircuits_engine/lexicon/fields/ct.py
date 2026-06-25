@@ -282,7 +282,7 @@ CT = SubfieldLexicon(
         r"\mathrm{Fun}(\mathcal{C}, \mathcal{D})(F, G) = \mathrm{Nat}(F, G)",
         r"\mathrm{gl.dim}\,\mathcal{A} = @N@",
         r"K_0(\mathcal{C}) \cong \mathbb{Z}^{@N@}",
-        r"\mathrm{Hom}(X, -) \text{ preserves limits}",
+        r"\mathrm{Hom}(\operatorname{colim} X_i, Y) \cong \lim_i \mathrm{Hom}(X_i, Y)",
     ],
     display_eqns=[
         r"\mathrm{Nat}(h_X, F) \cong F(X), \qquad "

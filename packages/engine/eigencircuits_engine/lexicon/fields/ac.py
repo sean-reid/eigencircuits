@@ -268,7 +268,7 @@ AC = SubfieldLexicon(
         r"\operatorname{Ass}(R/I) = \{\mathfrak{p}_1, \dots, \mathfrak{p}_{@C@}\}",
         r"\operatorname{Frob}: R \to R, \quad r \mapsto r^{p}",
         r"\widehat{R} \cong k[[x_1, \dots, x_{@N@}]]",
-        r"R_{\mathfrak{p}} \text{ is regular for all } \mathfrak{p}",
+        r"\operatorname{gl.dim} R_{\mathfrak{p}} < \infty",
         r"\operatorname{type}(R) = \dim_k \operatorname{soc}(R)",
         r"a(R) = -\dim R + @R@",
         r"I^{@C@} \subseteq \overline{I}^{\,@C@}",

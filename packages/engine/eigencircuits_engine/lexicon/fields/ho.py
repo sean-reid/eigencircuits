@@ -268,7 +268,7 @@ HO = SubfieldLexicon(
         r"\int_0^1 x^{@N@}\,dx = \frac{1}{@N@+1}",
         r"\log(ab) = \log a + \log b",
         r"\lim_{n \to \infty} \frac{1}{n} = 0",
-        r"@P@ \nmid (@P@-1)!\,+\,1 \ \text{is false}",
+        r"(@P@-1)! \equiv -1 \pmod{@P@}",
         r"\sqrt{2} \notin \mathbb{Q}",
         r"\deg(fg) = \deg f + \deg g",
         r"\lvert XSYM \rvert = @N@",

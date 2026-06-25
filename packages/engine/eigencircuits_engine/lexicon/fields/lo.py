@@ -273,7 +273,7 @@ LO = SubfieldLexicon(
         r"I(\aleph_@N@, T) \le \aleph_0",
         r"\Vdash_{\mathbb{P}} \dot\varphi",
         r"\mathrm{tp}(a/A) = p",
-        r"T \cup \{\neg\varphi\} \text{ is inconsistent}",
+        r"T \cup \{\neg\varphi\} \vdash \bot",
         r"\mathcal{M} \prec_{\Sigma_@N@} \mathcal{N}",
         r"\operatorname{acl}(A) \supseteq \operatorname{dcl}(A)",
     ],
