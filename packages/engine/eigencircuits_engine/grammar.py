@@ -114,7 +114,13 @@ GRAMMAR: Grammar = {
                     cap(article(_central)),
                     lit(" "),
                     _sym,
-                    lit(", going back to "),
+                    choice(
+                        [
+                            (2, lit(", in the sense of ")),
+                            (1, lit(", introduced by ")),
+                            (1, lit(", going back to ")),
+                        ]
+                    ),
                     pick("names"),
                     lit(", "),
                     ref("gloss"),
@@ -491,7 +497,13 @@ GRAMMAR: Grammar = {
                 2,
                 seq(
                     cap(article(_central)),
-                    lit(", going back to "),
+                    choice(
+                        [
+                            (2, lit(", in the sense of ")),
+                            (1, lit(", introduced by ")),
+                            (1, lit(", going back to ")),
+                        ]
+                    ),
                     pick("names"),
                     lit(", "),
                     ref("gloss"),
@@ -500,32 +512,70 @@ GRAMMAR: Grammar = {
             ),
         ]
     ),
-    "IntroPriorWork": seq(
-        lit("The study of "),
-        plural(ref("mainObject")),
-        choice(
-            [
-                (1, lit(" has been extensively developed in recent years")),
-                (1, lit(" has attracted considerable attention")),
-            ]
-        ),
-        choice(
-            [
-                (2, seq(lit("; see "), cite(2, 3), lit(" and the references therein."))),
-                (
-                    2,
-                    seq(
-                        lit("; see, for instance, the work of "),
-                        pick("names"),
-                        lit(" and "),
-                        pick("names"),
-                        lit(" "),
-                        cite(1, 2),
-                        lit("."),
+    "IntroPriorWork": choice(
+        [
+            (
+                3,
+                seq(
+                    lit("The study of "),
+                    plural(ref("mainObject")),
+                    choice(
+                        [
+                            (1, lit(" has been extensively developed in recent years")),
+                            (1, lit(" has attracted considerable attention")),
+                        ]
                     ),
+                    nt("_PriorCite"),
                 ),
-            ]
-        ),
+            ),
+            (
+                2,
+                seq(
+                    cap(plural(ref("mainObject"))),
+                    lit(" have been the subject of intensive study"),
+                    nt("_PriorCite"),
+                ),
+            ),
+            (
+                2,
+                seq(
+                    lit("Interest in "),
+                    plural(ref("mainObject")),
+                    lit(" goes back to the foundational work of "),
+                    pick("names"),
+                    lit(" "),
+                    cite(1, 1),
+                    lit("."),
+                ),
+            ),
+            (
+                1,
+                seq(
+                    lit("It is a basic problem to understand "),
+                    plural(ref("mainObject")),
+                    lit("; see "),
+                    cite(2, 3),
+                    lit("."),
+                ),
+            ),
+        ]
+    ),
+    "_PriorCite": choice(
+        [
+            (2, seq(lit("; see "), cite(2, 3), lit(" and the references therein."))),
+            (
+                2,
+                seq(
+                    lit("; see, for instance, the work of "),
+                    pick("names"),
+                    lit(" and "),
+                    pick("names"),
+                    lit(" "),
+                    cite(1, 2),
+                    lit("."),
+                ),
+            ),
+        ]
     ),
     "IntroGap": choice(
         [
@@ -537,6 +587,16 @@ GRAMMAR: Grammar = {
                     lit(" of "),
                     _sym,
                     lit("."),
+                ),
+            ),
+            (
+                2,
+                seq(
+                    lit("Nevertheless, the "),
+                    ref("invariant"),
+                    lit(" of "),
+                    _sym,
+                    lit(" is still poorly understood in general."),
                 ),
             ),
             (1, seq(lit("However, little is known beyond the "), pick("props"), lit(" case."))),
