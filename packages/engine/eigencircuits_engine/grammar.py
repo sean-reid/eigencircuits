@@ -210,7 +210,27 @@ GRAMMAR: Grammar = {
                     lit("."),
                 ),
             ),
-            (1, seq(lit("along the way, we give a new proof of "), ref("relResult"), lit("."))),
+            (2, seq(lit("along the way, we give a new proof of "), ref("relResult"), lit("."))),
+            (2, lit("the argument is elementary and largely self-contained.")),
+            (
+                2,
+                seq(
+                    lit("we expect the method to apply to other "),
+                    plural(ref("mainObject")),
+                    lit("."),
+                ),
+            ),
+            (2, seq(lit("as a special case, we recover "), ref("relResult"), lit("."))),
+            (2, lit("several examples show that our hypotheses cannot be removed.")),
+            (
+                1,
+                seq(
+                    lit("we conjecture that the same holds for arbitrary "),
+                    plural(ref("mainObject")),
+                    lit("."),
+                ),
+            ),
+            (1, lit("the methods developed here may be of independent interest.")),
         ]
     ),
     # --------------------------------------------------- theorem environments
