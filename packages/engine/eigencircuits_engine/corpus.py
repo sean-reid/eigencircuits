@@ -155,9 +155,15 @@ def listing_entry(entry: Entry, *, abstract: bool = False) -> dict[str, object]:
 
 def archive_payload(today: dt.date) -> dict[str, object]:
     manifest = build_manifest(today)
+    # Count over the recent window with the same primary-or-crosslist rule the
+    # listing uses, so each subject's number equals the "Total of N entries"
+    # shown after following its [recent] link.
+    window = set(recent_dates(manifest))
+    recent = [e for e in manifest if e.date in window]
     counts: dict[str, int] = {}
-    for e in manifest:
-        counts[e.primary] = counts.get(e.primary, 0) + 1
+    for e in recent:
+        for code in (e.primary, *e.crosslist):
+            counts[code] = counts.get(code, 0) + 1
     subjects = [
         {"code": f.code, "name": f.name, "count": counts.get(f.code, 0)}
         for f in sorted(FIELDS, key=lambda f: f.code)
@@ -165,7 +171,7 @@ def archive_payload(today: dt.date) -> dict[str, object]:
     return {
         "archive": "math",
         "subjects": subjects,
-        "total": len(manifest),
+        "total": len(recent),
         "recent_dates": [d.isoformat() for d in recent_dates(manifest)],
     }
 
