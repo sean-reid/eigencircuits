@@ -183,6 +183,10 @@ def titlecase(text: str) -> str:
 _SPACE_BEFORE_PUNCT = re.compile(r"\s+([,.;:!?)])")
 _MULTISPACE = re.compile(r"[ \t]{2,}")
 _SENTENCE_BOUNDARY = re.compile(r"([.!?])\s+([a-z])")
+# Collapse an immediately repeated word or hyphenated compound, e.g. when a
+# property coincides with an adjective already in the object name
+# ("Cohen--Macaulay Cohen--Macaulay ring", "Einstein Einstein manifold").
+_DUP_WORD = re.compile(r"\b([A-Za-z][\w-]*)(?:\s+\1\b)+")
 
 
 def finalize(text: str) -> str:
@@ -193,6 +197,7 @@ def finalize(text: str) -> str:
             continue
         seg = _SPACE_BEFORE_PUNCT.sub(r"\1", seg)
         seg = _MULTISPACE.sub(" ", seg)
+        seg = _DUP_WORD.sub(lambda m: m.group(1), seg)
         segments[i] = (False, seg)
     joined = "".join(seg for _, seg in segments)
     joined = _SENTENCE_BOUNDARY.sub(lambda m: f"{m.group(1)} {m.group(2).upper()}", joined)
