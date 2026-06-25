@@ -362,14 +362,26 @@ def _proof(ctx: GenContext) -> str:
                 used.append(opener)
                 parts.append(opener)
                 break
+    steps: list[str] = []
     for _ in range(ctx.rng.int_in_range(2, 5)):
         # Sometimes cite an earlier equation or result, as real proofs do.
         if ctx.int_refs and ctx.rng.chance(0.35):
-            parts.append(_cross_ref_step(ctx))
+            steps.append(_cross_ref_step(ctx))
         else:
-            parts.append(expand(NT("ProofStep"), ctx))
+            steps.append(expand(NT("ProofStep"), ctx))
+    # A proof must not end on a clause that promises more work ("It remains to
+    # show that ...", "We claim that ..."); re-roll the final step if it does.
+    tries = 0
+    while steps and steps[-1].startswith(_PROMISSORY) and tries < 6:
+        steps[-1] = expand(NT("ProofStep"), ctx)
+        tries += 1
+    parts.extend(steps)
     parts.append(_fresh(ctx, "__close__", PROOF_CLOSERS))
     return finalize(" ".join(parts))
+
+
+# Proof-step openers that promise a subsequent step, so they can't come last.
+_PROMISSORY = ("It remains to", "We claim that")
 
 
 def _cross_ref_step(ctx: GenContext) -> str:

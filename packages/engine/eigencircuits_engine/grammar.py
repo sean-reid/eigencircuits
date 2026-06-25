@@ -182,7 +182,7 @@ GRAMMAR: Grammar = {
             (
                 2,
                 seq(
-                    lit("as an application, we deduce "),
+                    lit("as an application, we establish "),
                     ref("relResult"),
                     lit(" for "),
                     plural(ref("mainObject")),
