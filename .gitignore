@@ -4,6 +4,7 @@ research/
 # Tooling / assistant config
 .claude/
 CLAUDE.md
+PLAN.md
 
 # Node
 node_modules/
