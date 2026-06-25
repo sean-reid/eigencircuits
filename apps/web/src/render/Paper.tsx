@@ -18,7 +18,8 @@ function Authors({ model }: { model: PaperModel }) {
       </div>
       <ol className="affiliations">
         {model.affiliations.map((aff, i) => (
-          <li key={i} value={i + 1}>
+          <li key={i}>
+            {multi && <sup className="aff-num">{i + 1}</sup>}
             {aff}
           </li>
         ))}
@@ -70,7 +71,9 @@ export function Paper({ model }: { model: PaperModel }) {
   const secondary = model.msc_secondary.join(', ');
   return (
     <article className="paper" aria-label="generated paper">
-      <h1 className="title">{model.title}</h1>
+      <h1 className="title">
+        <InlineText text={model.title} />
+      </h1>
       <Authors model={model} />
 
       <section className="abstract">

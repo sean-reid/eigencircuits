@@ -44,6 +44,12 @@
   font-size: 0.7em;
 }
 
+.affiliations .aff-num {
+  font-size: 0.7em;
+  margin-right: 0.25em;
+  vertical-align: super;
+}
+
 .abstract {
   font-size: 0.95rem;
   margin: 0 1.5rem 1.25rem;
