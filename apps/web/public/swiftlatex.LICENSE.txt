@@ -1,5 +1,8 @@
-swiftlatexpdftex.js and swiftlatexpdftex.wasm are unmodified builds of the
-SwiftLaTeX pdfTeX engine.
+swiftlatexpdftex.js and swiftlatexpdftex.wasm are builds of the SwiftLaTeX
+pdfTeX engine. swiftlatexpdftex.js carries one local change: when a fetched
+TeX file has no `fileid` response header, it falls back to the requested file
+name, so the engine works against a plain static host (our Cloudflare assets)
+that does not set that header.
 
   Source:  https://github.com/SwiftLaTeX/SwiftLaTeX
   Author:  Elliott Wen and contributors
