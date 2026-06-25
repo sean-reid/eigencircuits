@@ -22,11 +22,6 @@ export function Layout() {
 
   return (
     <div className="site">
-      <div className="ack-bar">
-        We gratefully acknowledge support from the Simons Foundation, member institutions, and all
-        contributors.
-      </div>
-
       <header className="masthead">
         <Link to="/" className="wordmark">
           eigencircuits

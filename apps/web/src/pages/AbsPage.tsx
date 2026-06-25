@@ -31,7 +31,8 @@ export function AbsPage() {
     <div className="abs">
       <div className="abs-main">
         <div className="breadcrumb">
-          math &gt; {data.primary} &gt; arXiv:{data.id}
+          <Link to="/archive/math">math</Link> &gt;{' '}
+          <Link to={`/list/${data.primary}/recent`}>{data.primary}</Link> &gt; arXiv:{data.id}
         </div>
         <h1 className="abs-title">
           <InlineText text={data.model.title} />
