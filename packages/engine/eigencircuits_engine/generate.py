@@ -126,6 +126,22 @@ def to_dict(model: PaperModel) -> dict[str, Any]:
     return asdict(model)
 
 
+def front_matter(seed: str | int | None = None, subfield: str | None = None) -> dict[str, Any]:
+    """Just the title, authors, and abstract -- cheap enough to scan the whole
+    corpus for search. Consumes randomness in the same order as ``generate`` up
+    to the authors, so the title/abstract match the full paper exactly."""
+    seed_int = parse_seed(seed) if seed is not None else secrets.randbits(32)
+    rng = Rng(seed_int)
+    field = BY_CODE[subfield] if subfield is not None else select_field(rng)
+    style = make_style(rng)
+    ctx = _make_context(rng, field, style)
+    init_theme(ctx)
+    title = _title(ctx)
+    abstract = finalize(expand(NT("Abstract"), ctx))
+    authors, _ = make_authors(rng)
+    return {"title": title, "abstract": abstract, "authors": [a.name for a in authors]}
+
+
 def _item_number(ctx: GenContext) -> str:
     ctx.counters["item"] = ctx.counters.get("item", 0) + 1
     n = ctx.counters["item"]

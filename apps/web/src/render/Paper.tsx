@@ -74,18 +74,15 @@ export function Paper({ model }: { model: PaperModel }) {
       <Authors model={model} />
 
       <section className="abstract">
-        <span className="abstract-head">Abstract.</span>{' '}
-        <InlineText text={model.abstract} />
+        <span className="abstract-head">Abstract.</span> <InlineText text={model.abstract} />
       </section>
 
       <p className="msc">
-        <span className="label">2020 Mathematics Subject Classification.</span>{' '}
-        {model.msc_primary}
+        <span className="label">2020 Mathematics Subject Classification.</span> {model.msc_primary}
         {secondary ? `; ${secondary}` : ''}.
       </p>
       <p className="keywords">
-        <span className="label">Key words and phrases.</span>{' '}
-        {model.keywords.join(', ')}.
+        <span className="label">Key words and phrases.</span> {model.keywords.join(', ')}.
       </p>
 
       {model.sections.map((s) => (
@@ -114,8 +111,7 @@ export function Paper({ model }: { model: PaperModel }) {
         <ol className="reflist">
           {model.references.map((r) => (
             <li key={r.label}>
-              <span className="reflabel">[{r.label}]</span>{' '}
-              <InlineText text={r.text} />
+              <span className="reflabel">[{r.label}]</span> <InlineText text={r.text} />
             </li>
           ))}
         </ol>

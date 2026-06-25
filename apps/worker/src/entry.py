@@ -62,6 +62,12 @@ async def on_fetch(request) -> Response:
         skip = max(0, _int(params, "skip", 0))
         show = min(2000, max(1, _int(params, "show", 50)))
         return _json(corpus.list_payload(_today(), cat, period, skip, show))
+    if route.path == "/search":
+        query = params.get("q", [""])[0]
+        cat = params.get("cat", [""])[0]
+        skip = max(0, _int(params, "skip", 0))
+        show = min(500, max(1, _int(params, "show", 50)))
+        return _json(corpus.search_payload(_today(), query, cat, skip, show))
     if route.path == "/abs":
         payload = corpus.abs_payload(_today(), params.get("id", [""])[0])
         return _json(payload, status=200) if payload else _json({"error": "not found"}, 404)

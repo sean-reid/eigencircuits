@@ -51,7 +51,11 @@ function renderProse(text: string, key: string): ReactNode[] {
     if (m.index > last) nodes.push(normalized.slice(last, m.index));
     const inner = m[2];
     nodes.push(
-      m[1] === 'emph' ? <em key={`${key}-${n}`}>{inner}</em> : <strong key={`${key}-${n}`}>{inner}</strong>,
+      m[1] === 'emph' ? (
+        <em key={`${key}-${n}`}>{inner}</em>
+      ) : (
+        <strong key={`${key}-${n}`}>{inner}</strong>
+      ),
     );
     last = m.index + m[0].length;
     n += 1;

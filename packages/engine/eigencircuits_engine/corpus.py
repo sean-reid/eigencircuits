@@ -10,10 +10,11 @@ batch appears automatically every day, with no database.
 from __future__ import annotations
 
 import datetime as dt
+import functools
 import zlib
 from dataclasses import dataclass
 
-from .generate import generate, to_dict
+from .generate import front_matter, generate, to_dict
 from .latex import to_latex
 from .lexicon.fields.registry import BY_CODE, FIELDS
 
@@ -177,6 +178,33 @@ def list_payload(today: dt.date, cat: str, period: str, skip: int, show: int) ->
         "show": show,
         "recent_dates": [d.isoformat() for d in recent_dates(manifest)],
         "entries": [listing_entry(e) for e in page],
+    }
+
+
+@functools.lru_cache(maxsize=8192)
+def _front(seed: int, primary: str) -> tuple[str, str, str]:
+    fm = front_matter(seed, primary)
+    return fm["title"], fm["abstract"], " ".join(fm["authors"])
+
+
+def search_payload(today: dt.date, query: str, cat: str, skip: int, show: int) -> dict[str, object]:
+    needle = query.strip().lower()
+    matches: list[Entry] = []
+    if needle:
+        pool = for_category(build_manifest(today), cat) if cat else build_manifest(today)
+        for e in pool:
+            title, abstract, authors = _front(e.seed, e.primary)
+            if needle in f"{title}\n{abstract}\n{authors}".lower():
+                matches.append(e)
+        matches.sort(key=lambda e: (e.date, e.id), reverse=True)
+    total = len(matches)
+    return {
+        "query": query,
+        "cat": cat,
+        "total": total,
+        "skip": skip,
+        "show": show,
+        "entries": [listing_entry(e) for e in matches[skip : skip + show]],
     }
 
 

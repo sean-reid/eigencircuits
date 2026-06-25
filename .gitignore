@@ -14,6 +14,7 @@ build/
 coverage/
 playwright-report/
 test-results/
+**/tests-e2e/__screens__/
 
 # Python
 __pycache__/
