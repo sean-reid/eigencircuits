@@ -123,7 +123,9 @@ export function PdfPage() {
       )}
 
       {phase.kind === 'ready' && (
-        <iframe className="pdf-frame" src={phase.url} title={`eiGen:${id} (PDF)`} />
+        // #view=FitH asks the viewer to fit the page width to the frame, so the
+        // page isn't clipped on narrow (mobile) screens.
+        <iframe className="pdf-frame" src={`${phase.url}#view=FitH`} title={`eiGen:${id} (PDF)`} />
       )}
     </div>
   );

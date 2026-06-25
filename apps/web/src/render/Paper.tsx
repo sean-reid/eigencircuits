@@ -87,7 +87,8 @@ export function Paper({ model }: { model: PaperModel }) {
         {secondary ? `; ${secondary}` : ''}.
       </p>
       <p className="keywords">
-        <span className="label">Key words and phrases.</span> {model.keywords.join(', ')}.
+        <span className="label">Key words and phrases.</span>{' '}
+        <InlineText text={model.keywords.join(', ')} />.
       </p>
 
       {model.sections.map((s) => (
