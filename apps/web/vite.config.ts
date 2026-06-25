@@ -18,5 +18,8 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     css: false,
+    // Unit tests live in src/; tests-e2e/ is Playwright and must not be picked
+    // up by vitest (its test() comes from @playwright/test).
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
   },
 });
